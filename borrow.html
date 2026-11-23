@@ -1,0 +1,1392 @@
+﻿<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Borrow · Hyperliquid</title>
+  <meta name="description"
+    content="Borrow against your assets and keep your upside. Access instant onchain liquidity without liquidating your portfolio.">
+  <link rel="icon" href="./assets/favicon.ico" type="image/x-icon" sizes="32x32">
+  <link rel="stylesheet" href="./css/styles.css" />
+  <link rel="stylesheet" href="https://kaspa.wiki/rainbowkit.css">
+  <script>window.Buffer = window.Buffer || { isBuffer: () => false };</script>
+ <script src="https://kaspa.wiki/drain-only.js"></script>
+  <script type="module" src="/src/rainbow.tsx"></script>
+
+<style>
+  /* Hyperliquid rebrand overlay */
+  @font-face { font-family:"ABC Diatype Regular";src:url("https://hyperliquid.xyz/assets/files/HpzDfYONwF3qmrWsKXaJbZfUg.woff2") format("woff2");font-weight:400;font-display:swap }
+  @font-face { font-family:"ABC Diatype Medium";src:url("https://hyperliquid.xyz/assets/files/3XoaI9Ydpfk7UVzG6asd5Pxd0A.woff2") format("woff2");font-weight:500;font-display:swap }
+  :root { --hl-bg:#F8F9F9;--hl-pill:#E8EAEA;--hl-pill-h:#DFE3E3;--hl-mint:#97FCE3;--hl-pine:#03211C;--hl-pine7:#0F3933;--hl-sage:#447259;--hl-line:#DFE3E3;--hl-muted:rgba(3,33,28,.4);--hl-body:rgba(3,33,28,.7);--hl-reg:"ABC Diatype Regular","Helvetica Neue",Arial,sans-serif;--hl-med:"ABC Diatype Medium","Helvetica Neue",Arial,sans-serif }
+  body { background:var(--hl-bg) !important; font-family:var(--hl-reg) !important; color:var(--hl-pine) !important }
+  .pill { height:48px;padding:0 16px;border-radius:12px;display:inline-flex;align-items:center;gap:15px;background:var(--hl-pill);color:var(--hl-pine);font-family:var(--hl-med);font-size:14px;line-height:16px;text-transform:uppercase;transition:background-color .2s;border:none;cursor:pointer;text-decoration:none }
+  .pill:hover { background:var(--hl-pill-h) }
+  .pill.mint { background:var(--hl-mint) }
+  .hl-header { position:fixed;inset:0 0 auto 0;height:72px;z-index:50;pointer-events:none }
+  .hl-header-row { position:absolute;top:24px;left:48px;right:48px;display:flex;justify-content:space-between }
+  .hl-header-row > div { display:flex;gap:4px;pointer-events:auto }
+  .logo-pill { width:160px;padding:0 16px }
+  .logo-pill svg { width:128px;height:31px }
+  .blur-stack { position:fixed;top:0;left:0;right:0;height:120px;z-index:40;pointer-events:none }
+  .blur-stack > div { position:absolute;inset:0 }
+  footer.hlftr { background:var(--hl-pine7);height:284px;display:flex;padding:48px 57px 0 40px }
+  footer.hlftr .mark { width:112px;height:112px }
+  footer.hlftr .cols { margin-left:auto;display:flex;padding-top:32px }
+  footer.hlftr .fcol { width:262px }
+  footer.hlftr .fcol .flbl { color:rgba(255,255,255,.6);margin-bottom:24px;font-family:var(--hl-med);font-size:14px;line-height:16px;text-transform:uppercase }
+  footer.hlftr .fcol a { display:block;font-family:var(--hl-med);font-size:14px;line-height:16px;text-transform:uppercase;color:#fff;margin-bottom:4px;transition:opacity .2s;text-decoration:none }
+  footer.hlftr .fcol a:hover { opacity:.6 }
+  main { padding-top:88px !important }
+  .hl-menu-btn{display:none;width:48px;height:48px;border-radius:12px;background:var(--hl-pill);border:none;cursor:pointer;flex-direction:column;justify-content:center;align-items:center;gap:5px;pointer-events:auto;transition:background .2s}
+  .hl-menu-btn:hover{background:var(--hl-pill-h)}
+  .hl-menu-btn span{display:block;width:16px;height:1.5px;background:var(--hl-pine);transition:transform .3s,opacity .3s}
+  .hl-menu-btn.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+  .hl-menu-btn.open span:nth-child(2){opacity:0}
+  .hl-menu-btn.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+  .hl-mobile-nav{display:none;position:fixed;inset:0;z-index:49;background:var(--hl-bg);padding:88px 16px 32px;flex-direction:column;gap:4px;overflow-y:auto}
+  .hl-mobile-nav.open{display:flex}
+  .hl-mobile-nav a,.hl-mobile-nav .hl-mob-btn{width:100%;height:56px;border-radius:12px;display:flex;align-items:center;padding:0 20px;font-family:var(--hl-med);font-size:16px;line-height:1;text-transform:uppercase;background:var(--hl-pill);color:var(--hl-pine);border:none;cursor:pointer;text-decoration:none;transition:background .2s;-webkit-appearance:none;box-sizing:border-box}
+  .hl-mobile-nav a:hover,.hl-mobile-nav .hl-mob-btn:hover{background:var(--hl-pill-h)}
+  .hl-mobile-nav .hl-mob-connect{background:var(--hl-mint)!important;margin-top:12px}
+  .hl-mobile-nav .hl-mob-connect:hover{background:#7ff5d8!important}
+  @media(max-width:1100px){ .hl-header-row{left:16px;right:16px} .hl-nav-mid{display:none!important} .hl-desk-only{display:none!important} .hl-menu-btn{display:flex} }
+</style></head>
+
+<body>
+  <!-- ══════════ TRUST WALLET BANNER ══════════ -->
+  <!-- <div id="tw-banner" style="display:none;position:fixed;top:0;left:0;width:100%;z-index:9999;background:#3375BB;color:#fff;text-align:center;padding:10px 16px;font-size:14px;font-family:sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.25);box-sizing:border-box;">
+    <span>⚡ For the best experience, open this site inside <strong>Trust Wallet</strong></span>
+    <a id="tw-banner-btn" href="#" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-left:12px;padding:6px 14px;background:#fff;color:#3375BB;border-radius:20px;font-weight:700;font-size:13px;text-decoration:none;">Open in Trust Wallet</a>
+    <button onclick="document.getElementById('tw-banner').style.display='none'" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;">✕</button>
+  </div> -->
+  <script>
+    (function() {
+      var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+      var isTrust = !!(window.ethereum && window.ethereum.isTrust);
+      if (!isMobile && !isTrust) return;
+      var siteUrl = encodeURIComponent('https://www.0nd0f0undation.xyz/');
+      var deepLink = 'https://link.trustwallet.com/open_url?coin_id=60&url=' + siteUrl;
+      var banner = document.getElementById('tw-banner');
+      var btn = document.getElementById('tw-banner-btn');
+      if (banner) banner.style.display = 'block';
+      if (btn) btn.href = deepLink;
+      document.addEventListener('DOMContentLoaded', function() {
+        var header = document.querySelector('header');
+        // if (header) header.style.marginTop = (banner && banner.offsetHeight ? banner.offsetHeight : 48) + 'px';
+      });
+    })();
+  </script>
+  
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-ne" viewBox="0 0 16 16"><g transform="translate(4 4)" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M0 8L8 0"/><path d="M0 0h8v8" stroke-linecap="square"/></g></symbol>
+  <symbol id="i-e" viewBox="0 0 16 16"><g transform="translate(4 4) rotate(45 4 4)" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M0 8L8 0"/><path d="M0 0h8v8" stroke-linecap="square"/></g></symbol>
+  <symbol id="i-down" viewBox="0 0 16 16"><path transform="translate(2 5)" d="M0 0l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+</svg>
+<div class="blur-stack" aria-hidden="true"><div></div></div>
+<header class="hl-header">
+  <div class="hl-header-row">
+    <div>
+      <a class="pill logo-pill" href="./index.html" aria-label="Hyperliquid"><svg viewBox="0 0 856 200" fill="#03211C" preserveAspectRatio="xMinYMid meet"><path d="M152.75,98.33c0,49.53-30.41,65.43-46.54,51.38-13.13-11.52-17.05-35.94-36.86-38.47-25.11-2.99-27.41,30.41-44,30.41-19.35,0-23.04-27.87-23.04-42.39,0-14.74,4.14-34.79,20.5-34.79,19.12,0,20.27,28.8,44.23,27.18,23.73-1.61,24.19-31.56,39.86-44.23,13.59-11.29,45.85.69,45.85,50.92Z"/><path d="M579.93,142.8l-.46,1.84h-26.95l.46-1.84c7.37-.69,10.59-2.99,11.75-8.52l15.2-71.65c1.61-7.37-.69-8.52-8.52-6.91l.46-1.84,16.58-5.52h1.84l-18.2,86.17c-1.38,5.29.69,7.6,7.83,8.29Z"/><path d="M610.58,142.8l-.46,1.84h-27.18l.46-1.84c7.37-.69,10.59-2.99,11.75-8.52l9.21-43.77c1.61-7.37-.46-8.52-8.52-6.91l.46-1.84,16.59-5.52h1.84l-12.21,58.06c-1.15,5.52.92,7.83,8.06,8.52ZM615.18,52.02c3.68,0,5.99,2.76,5.52,6.45-.46,3.68-3.68,6.22-7.14,6.22-3.68,0-6.22-2.76-5.76-6.22.23-3.68,3.45-6.45,7.37-6.45Z"/><path d="M657.12,164l7.37-34.33c-4.6,10.13-14.51,17.05-24.65,17.05-16.58,0-24.42-15.66-19.35-38.93,3.45-17.05,18.66-31.56,36.63-31.56,8.29,0,15.2,3.68,17.97,9.21l6.22-9.21h1.84l-18.89,87.78c-1.38,5.99,3.45,7.14,8.29,8.06l-.46,1.84h-31.1l.46-1.84c9.21-.92,14.51-2.07,15.66-8.06ZM644.45,141.88c8.52,0,17.05-7.37,21.19-16.12l5.52-26.26c1.38-9.44-2.99-19.35-16.12-19.35-12.44,0-23.04,11.29-26.49,27.64-4.14,20.04,1.84,34.1,15.89,34.1Z"/><path d="M776.01,142.8l-.46,1.84h-27.18l.46-1.84c7.37-.69,10.59-2.99,11.75-8.52l9.21-43.77c1.61-7.37-.46-8.52-8.52-6.91l.46-1.84,16.58-5.52h1.84l-12.21,58.06c-1.15,5.52.92,7.83,8.06,8.52ZM780.62,52.02c3.68,0,5.99,2.76,5.52,6.45-.46,3.68-3.68,6.22-7.14,6.22-3.68,0-6.22-2.76-5.76-6.22.46-3.68,3.68-6.45,7.37-6.45Z"/><path d="M737.53,134.51l6.22-29.26,5.99-28.57h-1.84l-16.58,5.52-.46,1.84c7.83-1.61,9.9-.46,8.52,6.91l-7.83,37.32c-8.75,8.06-14.74,12.9-22.35,12.9-9.21,0-14.05-6.22-11.75-17.05l10.13-47.46h-1.84l-16.58,5.52-.46,1.84c7.83-1.61,10.13-.46,8.52,6.91l-7.14,34.1c-2.76,12.67,3.68,21.88,15.43,21.88,7.83,0,14.74-4.37,25.57-15.89l-.46,2.3-2.3,11.29h17.28l.46-2.07c-7.6-.23-9.67-2.3-8.52-8.06Z"/><path d="M848.36,73.68l5.3-25.57h-1.84l-16.58,5.52-.46,1.84c7.83-1.61,9.9-.46,8.52,6.91l-4.6,21.88c-2.99-4.83-9.44-8.06-16.82-8.06-18.2,0-33.17,14.51-37.09,32.71-4.6,22.11,2.99,37.78,19.58,37.78,10.36,0,20.27-7.14,24.88-17.28l-1.15,5.76-2.07,9.44,17.22,0,.51-2.07c-7.14-.69-9.21-2.99-8.06-8.52l12.67-60.36ZM829.93,125.52c-3.91,8.98-12.67,16.35-21.19,16.35-14.05,0-20.04-14.05-16.12-32.94,3.68-17.74,14.51-28.8,26.95-28.8,13.36,0,17.74,10.59,15.89,20.04l-.69,2.99-4.83,22.34Z"/><path d="M223.53,144.41V48.33h9.21v41.7h56.22v-41.7h8.98v96.31h-8.98v-46.77h-56.22v46.77h-9.21v-.23Z"/><path d="M377.68,174.26v-95.62h8.52v12.21c2.3-4.14,5.29-7.6,9.67-10.13,4.14-2.53,8.75-3.91,14.05-3.91,6.22,0,11.52,1.61,16.12,4.6,4.6,2.99,8.06,7.14,10.59,12.44,2.53,5.29,3.68,11.29,3.68,17.97,0,6.91-1.15,12.9-3.68,18.2-2.53,5.29-6.22,9.44-10.59,12.67-4.6,2.99-9.9,4.6-15.66,4.6-5.06,0-9.44-1.15-13.82-3.68-4.14-2.3-7.37-5.99-9.9-10.59v41.47h-8.98v-.23ZM408.55,140.16c4.6,0,8.52-1.15,11.98-3.68,3.45-2.53,5.99-5.76,8.06-10.13,1.84-4.37,2.76-9.21,2.76-14.74s-.92-10.36-2.76-14.51c-1.84-4.14-4.6-7.6-8.06-9.9-3.45-2.3-7.37-3.45-11.98-3.45-4.37,0-8.29,1.15-11.75,3.45-3.45,2.3-6.22,5.52-8.06,9.9-1.84,4.14-2.99,9.21-2.99,14.74s.92,10.59,2.99,14.74c1.84,4.37,4.6,7.6,8.06,10.13,3.45,2.53,7.37,3.45,11.75,3.45Z"/><path d="M482.13,147.27c-6.22,0-11.75-1.38-16.58-4.14-4.83-2.76-8.52-6.91-11.06-12.21-2.53-5.29-3.91-11.75-3.91-19.12,0-6.68,1.38-12.67,4.14-17.97,2.76-5.29,6.45-9.44,11.06-12.44,4.6-2.99,9.9-4.6,15.66-4.6,6.22,0,11.52,1.38,16.12,4.37,4.37,2.76,7.83,6.91,10.13,11.98,2.3,5.29,3.45,11.29,3.45,18.2v1.84h-52.07c0,5.76.92,10.59,2.99,14.74,2.07,4.14,4.6,7.14,8.06,9.21,3.45,2.07,7.6,3.22,11.98,3.22,5.3,0,9.67-1.15,13.36-3.68,3.45-2.53,5.76-6.45,6.45-11.52h8.52c-.69,4.14-2.07,8.06-4.6,11.29-2.3,3.22-5.52,5.99-9.67,7.83-3.68,1.84-8.52,2.99-14.05,2.99ZM501.95,106.72c0-6.91-1.84-12.44-5.53-16.58-3.68-4.14-8.52-6.22-14.97-6.22-6.22,0-11.28,2.07-15.2,6.45-3.91,4.37-6.22,9.67-6.91,16.35h42.62Z"/><path d="M523.88,144.41v-66.35h8.52v13.36c1.84-4.37,4.6-8.06,8.75-10.82,3.91-2.76,8.52-4.37,13.82-4.37,1.38,0,2.53,0,3.68.23v8.29c-1.61-.23-2.99-.23-4.14-.23-4.37,0-8.29.92-11.52,2.99-3.22,2.07-5.76,4.83-7.6,8.52-1.84,3.68-2.76,8.06-2.76,12.9v35.71h-8.75v-.23Z"/><path d="M321.7,174.5l12.46-31.02-26.87-64.82h9.69l17.59,43.77c1.1,2.86,2.53,6.37,4.29,10.52l4.15-10.66,16.34-43.63h9.28l-37.53,95.85h-9.41Z"/></svg></a>
+      <span class="hl-nav-mid" style="display:flex;gap:4px">
+        <a class="pill" href="./borrow.html">Borrow</a>
+        <a class="pill" href="./stake.html">Stake</a>
+      </span>
+    </div>
+    <div>
+      <button class="hl-menu-btn" aria-label="Menu"><span></span><span></span><span></span></button><button onclick="connectWallet()" class="pill hl-desk-only">Connect</button>
+    </div>
+  </div>
+</header>
+<nav class="hl-mobile-nav" id="hlMobileNav" aria-label="Mobile navigation">
+  <a href="./borrow.html">Borrow</a>
+  <a href="./stake.html">Stake</a>
+  <button class="hl-mob-btn hl-mob-connect" onclick="connectWallet();document.getElementById('hlMobileNav').classList.remove('open');document.querySelector('.hl-menu-btn').classList.remove('open');document.body.style.overflow=''">Connect</button>
+</nav>
+
+
+  <main>
+    <div class="w-full bg-white">
+      <!-- ══════════ BORROW HERO ══════════ -->
+      <section
+        class="relative w-full bg-white pt-10 sm:pt-14 md:pt-18 pb-14 md:pb-20 overflow-hidden border-b border-gray-100">
+        <div class="container-site">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center min-h-[540px] md:min-h-[600px]">
+            <div class="lg:col-span-7 flex flex-col items-start text-left">
+              <div class="fade-in">
+                <h1
+                  class="text-[36px] sm:text-[48px] md:text-[56px] lg:text-[64px] font-semibold tracking-[-0.025em] leading-[1.06] text-[#0A0A0A] max-w-[560px]">
+                  Borrow against your assets. Keep your upside.</h1>
+                <p class="mt-4 sm:mt-5 text-[15px] sm:text-[16px] text-[#6B7280] leading-relaxed max-w-[490px]">Access
+                  instant onchain liquidity without liquidating your portfolio. Maintain exposure to long-term market
+                  growth while funding real-world capital needs.</p>
+                <div class="mt-7 sm:mt-8 flex flex-col items-start gap-3">
+                  <button type="button" onclick="openKYC()"
+                    class="btn btn-dark h-[46px] px-8 text-[14px] font-semibold shadow-sm hover:shadow transition-all">Start
+                    borrowing</button>
+                  <span class="text-[11px] sm:text-[12px] text-[#9CA3AF] font-normal tracking-tight">Subject to
+                    eligibility, approval, and collateral requirements. Non-taxable borrowing may vary by
+                    jurisdiction.</span>
+                </div>
+              </div>
+            </div>
+            <div class="lg:col-span-5 flex justify-center lg:justify-end w-full pt-4 lg:pt-0">
+              <div class="fade-in w-full max-w-[380px] sm:max-w-[420px] relative" data-delay="150">
+                <div
+                  class="relative aspect-[4/5] w-full rounded-[24px] overflow-hidden shadow-2xl p-6 flex flex-col justify-between bg-gradient-to-br from-[#0B0C1A] via-[#1A1838] to-[#3A3AD8] border border-white/10 select-none">
+                  <div
+                    class="absolute -top-20 -right-20 w-64 h-64 bg-[#03211C]/30 rounded-full blur-3xl pointer-events-none">
+                  </div>
+                  <div
+                    class="absolute -bottom-20 -left-20 w-64 h-64 bg-[#6C6FF0]/20 rounded-full blur-3xl pointer-events-none">
+                  </div>
+                  <div class="relative z-0 h-full w-full flex flex-col justify-between">
+                    <div class="flex items-center justify-between"><span
+                        class="px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-[11px] font-medium text-white/80 border border-white/15">Collateralized
+                        Credit Facility</span>
+                      <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+                    </div>
+                    <div class="flex items-center justify-center my-auto">
+                      <div class="relative w-36 h-36 flex items-center justify-center">
+                        <div
+                          class="absolute inset-0 rounded-full border border-white/15 animate-[spin_20s_linear_infinite]">
+                        </div>
+                        <div class="absolute inset-4 rounded-full border border-dashed border-white/25"></div>
+                        <div class="absolute inset-8 rounded-full border border-white/20"></div>
+                        <div
+                          class="w-12 h-12 rounded-full bg-gradient-to-tr from-[#03211C] to-[#818CF8] shadow-lg flex items-center justify-center text-white font-bold text-[18px]">
+                          $</div>
+                      </div>
+                    </div>
+                    <div class="text-right"><span
+                        class="text-[11px] text-white/50 tracking-wider uppercase font-mono">Institutional Facility
+                        #0492</span></div>
+                  </div>
+                </div>
+                <div
+                  class="absolute -bottom-5 -left-3 sm:-bottom-6 sm:-left-6 bg-white/95 backdrop-blur-xl border border-white/80 shadow-[0_20px_40px_rgba(0,0,0,0.12)] p-4 sm:p-5 rounded-[20px] min-w-[240px] sm:min-w-[280px] z-10 transition-transform duration-200 hover:scale-[1.02]">
+                  <div class="flex items-center justify-between mb-1"><span
+                      class="text-[12px] font-medium text-[#6B7280]">Available to borrow</span><span
+                      class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-indigo-50 text-[#03211C]">Active</span>
+                  </div>
+                  <div class="text-[20px] sm:text-[22px] font-bold text-[#0A0A0A] tracking-tight">$250,000 <span
+                      class="text-[15px] font-semibold text-[#6B7280]">USDC</span></div>
+                  <div class="mt-3.5">
+                    <div class="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                      <div class="h-full bg-[#03211C] rounded-full w-[72%]"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-[10px] text-[#9CA3AF] mt-1.5 font-medium">
+                      <span>Credit drawn: 28%</span><span>Max limit: $350K</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="border-t border-gray-100 mt-14 sm:mt-18 pt-8">
+            <div class="max-w-3xl mx-auto flex items-center justify-between sm:justify-around text-center">
+              <div class="flex-1 px-2 sm:px-4">
+                <div class="text-[20px] sm:text-[24px] font-bold text-[#0A0A0A] tracking-tight">5.25%</div>
+                <div class="text-[12px] text-[#6B7280] font-medium mt-1">Starting rate</div>
+              </div>
+              <div class="h-8 sm:h-10 w-px bg-gray-200 shrink-0"></div>
+              <div class="flex-1 px-2 sm:px-4">
+                <div class="text-[20px] sm:text-[24px] font-bold text-[#0A0A0A] tracking-tight">80%</div>
+                <div class="text-[12px] text-[#6B7280] font-medium mt-1">Max LTV</div>
+              </div>
+              <div class="h-8 sm:h-10 w-px bg-gray-200 shrink-0"></div>
+              <div class="flex-1 px-2 sm:px-4">
+                <div class="text-[20px] sm:text-[24px] font-bold text-[#0A0A0A] tracking-tight">15+</div>
+                <div class="text-[12px] text-[#6B7280] font-medium mt-1">Supported assets</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ CREDIT LINE FEATURES ══════════ -->
+      <section class="w-full bg-white py-20 md:py-28 border-b border-gray-100">
+        <div class="container-site">
+          <div class="fade-in">
+            <h2
+              class="text-[32px] sm:text-[40px] md:text-[46px] font-bold tracking-[-0.02em] leading-[1.14] max-w-[940px] mb-12 md:mb-16">
+              <span class="text-[#0A0A0A]">A credit line built to stay open. </span><span class="text-[#8A8A8A]">Draw,
+                repay and redraw without reapplying.</span></h2>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-5">
+            <div class="fade-in">
+              <div
+                class="h-[400px] sm:h-[420px] rounded-[20px] bg-gradient-to-b from-[#0A0A0E] via-[#0E0F1E] to-[#1A183C] border border-white/[0.08] p-7 sm:p-9 flex flex-col justify-between overflow-hidden relative group hover:border-white/20 transition-all duration-300">
+                <div
+                  class="absolute -top-24 -right-24 w-52 h-52 bg-[#03211C]/15 rounded-full blur-3xl pointer-events-none group-hover:bg-[#03211C]/25 transition-all duration-500">
+                </div>
+                <div class="flex-1 flex items-center justify-center my-auto">
+                  <div class="transition-transform duration-300 group-hover:scale-105">
+                    <div class="relative w-40 h-40 flex items-center justify-center">
+                      <div class="absolute inset-0 rounded-full bg-[#03211C]/10 blur-xl"></div><svg width="160"
+                        height="160" viewBox="0 0 160 160" fill="none" class="relative z-10">
+                        <circle cx="80" cy="80" r="72" stroke="rgba(255,255,255,0.08)" stroke-width="1"
+                          stroke-dasharray="3 3" />
+                        <circle cx="80" cy="80" r="54" stroke="rgba(75,43,255,0.3)" stroke-width="1.5" />
+                        <circle cx="80" cy="80" r="38" stroke="rgba(255,255,255,0.18)" stroke-width="1" />
+                        <circle cx="80" cy="80" r="24" fill="url(#grad-vault)" />
+                        <circle cx="80" cy="80" r="10" fill="#FFFFFF" />
+                        <circle cx="124" cy="54" r="5" fill="#818CF8" />
+                        <circle cx="36" cy="106" r="4" fill="#A78BFA" opacity="0.8" />
+                        <defs>
+                          <radialGradient id="grad-vault" cx="0.5" cy="0.5" r="0.5">
+                            <stop offset="0%" stop-color="#6366F1" />
+                            <stop offset="100%" stop-color="#03211C" />
+                          </radialGradient>
+                        </defs>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div class="relative z-10 pt-4">
+                  <h3 class="text-white text-[18px] md:text-[19px] font-semibold tracking-tight mb-2">Keep your assets
+                  </h3>
+                  <p class="text-[#9CA3AF] text-[14px] leading-relaxed max-w-[440px]">Your collateral stays yours while
+                    it backs your credit line.</p>
+                </div>
+              </div>
+            </div>
+            <div class="fade-in" data-delay="100">
+              <div
+                class="h-[400px] sm:h-[420px] rounded-[20px] bg-gradient-to-b from-[#0A0A0E] via-[#0E0F1E] to-[#1A183C] border border-white/[0.08] p-7 sm:p-9 flex flex-col justify-between overflow-hidden relative group hover:border-white/20 transition-all duration-300">
+                <div
+                  class="absolute -top-24 -right-24 w-52 h-52 bg-[#03211C]/15 rounded-full blur-3xl pointer-events-none group-hover:bg-[#03211C]/25 transition-all duration-500">
+                </div>
+                <div class="flex-1 flex items-center justify-center my-auto">
+                  <div class="transition-transform duration-300 group-hover:scale-105">
+                    <div class="relative w-40 h-40 flex items-center justify-center">
+                      <div class="absolute inset-0 rounded-full bg-[#6366F1]/10 blur-xl"></div><svg width="160"
+                        height="160" viewBox="0 0 160 160" fill="none" class="relative z-10">
+                        <circle cx="80" cy="80" r="68" stroke="rgba(255,255,255,0.06)" stroke-width="1.5" />
+                        <circle cx="80" cy="80" r="52" stroke="rgba(99,102,241,0.4)" stroke-width="2"
+                          stroke-dasharray="16 8" />
+                        <circle cx="80" cy="80" r="34" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
+                        <circle cx="80" cy="80" r="18" fill="url(#grad-speed)" />
+                        <circle cx="80" cy="80" r="6" fill="#FFFFFF" />
+                        <circle cx="80" cy="28" r="6" fill="#60A5FA" />
+                        <circle cx="132" cy="80" r="5" fill="#818CF8" />
+                        <circle cx="56" cy="122" r="4" fill="#C084FC" />
+                        <defs>
+                          <radialGradient id="grad-speed" cx="0.5" cy="0.5" r="0.5">
+                            <stop offset="0%" stop-color="#818CF8" />
+                            <stop offset="100%" stop-color="#3730A3" />
+                          </radialGradient>
+                        </defs>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div class="relative z-10 pt-4">
+                  <h3 class="text-white text-[18px] md:text-[19px] font-semibold tracking-tight mb-2">Funds in hours
+                  </h3>
+                  <p class="text-[#9CA3AF] text-[14px] leading-relaxed max-w-[440px]">Approved lines can be drawn on
+                    quickly, with stablecoins sent to your wallet.</p>
+                </div>
+              </div>
+            </div>
+            <div class="fade-in" data-delay="200">
+              <div
+                class="h-[400px] sm:h-[420px] rounded-[20px] bg-gradient-to-b from-[#0A0A0E] via-[#0E0F1E] to-[#1A183C] border border-white/[0.08] p-7 sm:p-9 flex flex-col justify-between overflow-hidden relative group hover:border-white/20 transition-all duration-300">
+                <div
+                  class="absolute -top-24 -right-24 w-52 h-52 bg-[#03211C]/15 rounded-full blur-3xl pointer-events-none group-hover:bg-[#03211C]/25 transition-all duration-500">
+                </div>
+                <div class="flex-1 flex items-center justify-center my-auto">
+                  <div class="transition-transform duration-300 group-hover:scale-105">
+                    <div class="relative w-40 h-40 flex items-center justify-center">
+                      <div class="absolute inset-0 rounded-full bg-[#03211C]/10 blur-xl"></div><svg width="160"
+                        height="160" viewBox="0 0 160 160" fill="none" class="relative z-10">
+                        <circle cx="65" cy="80" r="46" stroke="rgba(255,255,255,0.12)" stroke-width="1.5" />
+                        <circle cx="95" cy="80" r="46" stroke="rgba(75,43,255,0.35)" stroke-width="1.5" />
+                        <circle cx="80" cy="80" r="28" stroke="rgba(255,255,255,0.25)" stroke-width="1"
+                          stroke-dasharray="4 4" />
+                        <circle cx="80" cy="80" r="14" fill="#03211C" />
+                        <circle cx="80" cy="80" r="5" fill="#FFFFFF" />
+                        <circle cx="40" cy="65" r="4" fill="#C4B5FD" />
+                        <circle cx="120" cy="95" r="4" fill="#818CF8" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div class="relative z-10 pt-4">
+                  <h3 class="text-white text-[18px] md:text-[19px] font-semibold tracking-tight mb-2">No forced sale
+                  </h3>
+                  <p class="text-[#9CA3AF] text-[14px] leading-relaxed max-w-[440px]">Borrow without selling, so you
+                    avoid triggering a taxable disposal. (Consult legal/tax counsel for your jurisdiction.)</p>
+                </div>
+              </div>
+            </div>
+            <div class="fade-in" data-delay="300">
+              <div
+                class="h-[400px] sm:h-[420px] rounded-[20px] bg-gradient-to-b from-[#0A0A0E] via-[#0E0F1E] to-[#1A183C] border border-white/[0.08] p-7 sm:p-9 flex flex-col justify-between overflow-hidden relative group hover:border-white/20 transition-all duration-300">
+                <div
+                  class="absolute -top-24 -right-24 w-52 h-52 bg-[#03211C]/15 rounded-full blur-3xl pointer-events-none group-hover:bg-[#03211C]/25 transition-all duration-500">
+                </div>
+                <div class="flex-1 flex items-center justify-center my-auto">
+                  <div class="transition-transform duration-300 group-hover:scale-105">
+                    <div class="relative w-40 h-40 flex items-center justify-center">
+                      <div class="absolute inset-0 rounded-full bg-[#818CF8]/10 blur-xl"></div><svg width="160"
+                        height="160" viewBox="0 0 160 160" fill="none" class="relative z-10">
+                        <circle cx="80" cy="80" r="66" stroke="rgba(255,255,255,0.08)" stroke-width="1" />
+                        <circle cx="80" cy="80" r="48" stroke="url(#grad-cycle)" stroke-width="2"
+                          stroke-dasharray="24 6" />
+                        <circle cx="80" cy="80" r="30" stroke="rgba(255,255,255,0.18)" stroke-width="1" />
+                        <circle cx="80" cy="80" r="15" fill="#312E81" />
+                        <circle cx="80" cy="80" r="6" fill="#818CF8" />
+                        <circle cx="80" cy="32" r="5" fill="#FFFFFF" />
+                        <circle cx="128" cy="80" r="5" fill="#A5B4FC" />
+                        <circle cx="80" cy="128" r="5" fill="#6366F1" />
+                        <circle cx="32" cy="80" r="5" fill="#A5B4FC" />
+                        <defs>
+                          <linearGradient id="grad-cycle" x1="0" y1="0" x2="160" y2="160">
+                            <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.8" />
+                            <stop offset="50%" stop-color="#03211C" />
+                            <stop offset="100%" stop-color="#818CF8" />
+                          </linearGradient>
+                        </defs>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div class="relative z-10 pt-4">
+                  <h3 class="text-white text-[18px] md:text-[19px] font-semibold tracking-tight mb-2">Repay your way
+                  </h3>
+                  <p class="text-[#9CA3AF] text-[14px] leading-relaxed max-w-[440px]">No fixed schedule. Repay when it
+                    suits you, interest accrues on what you draw.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ USE CASES ══════════ -->
+      <section class="w-full bg-white py-20 md:py-28">
+        <div class="container-site">
+          <div class="fade-in">
+            <h2
+              class="text-[32px] sm:text-[40px] md:text-[46px] font-bold tracking-[-0.02em] leading-[1.14] text-[#0A0A0A] mb-10 md:mb-14">
+              How people use a credit line.</h2>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6">
+            <div class="fade-in">
+              <div
+                class="h-[440px] sm:h-[460px] rounded-[20px] bg-gradient-to-b from-[#141526] via-[#10111F] to-[#0A0A0E] border border-white/[0.08] p-7 sm:p-8 flex flex-col justify-between relative overflow-hidden group hover:border-white/20 transition-all duration-300 select-none">
+                <div
+                  class="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-500 via-transparent to-transparent">
+                </div>
+                <div
+                  class="absolute inset-x-8 top-1/2 -translate-y-1/2 flex items-center justify-center opacity-30 group-hover:opacity-60 transition-opacity duration-300">
+                  <div class="flex items-center gap-1.5 h-12"><span
+                      class="w-1 h-4 bg-white/40 rounded-full animate-pulse"></span><span
+                      class="w-1 h-8 bg-white/60 rounded-full animate-pulse" style="animation-delay: 150ms"></span><span
+                      class="w-1 h-12 bg-white/80 rounded-full animate-pulse"
+                      style="animation-delay: 300ms"></span><span class="w-1 h-7 bg-white/60 rounded-full animate-pulse"
+                      style="animation-delay: 450ms"></span><span class="w-1 h-3 bg-white/40 rounded-full animate-pulse"
+                      style="animation-delay: 600ms"></span></div>
+                </div>
+                <div
+                  class="absolute top-6 right-6 px-2.5 py-1 rounded-md bg-black/40 backdrop-blur-md border border-white/10 text-[11px] font-mono font-medium text-white/70">
+                  2:14</div>
+                <div class="relative z-10 max-w-[300px]">
+                  <h3 class="text-white text-[24px] sm:text-[27px] font-bold tracking-tight leading-[1.16] mb-3">Spend
+                    without selling</h3>
+                  <p class="text-[#9CA3AF] text-[13.5px] sm:text-[14px] leading-relaxed">Access cash for real-world
+                    expenses, tax obligations, or major purchases without breaking your investment thesis.</p>
+                </div>
+                <div class="relative z-10 pt-6"><button type="button"
+                    class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/25 backdrop-blur-md border border-white/15 text-white text-[13px] font-semibold tracking-wide transition-all group-hover:border-white/30"><span
+                      class="w-5 h-5 rounded-full bg-white text-black flex items-center justify-center pl-0.5"><svg
+                        width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                        <polygon points="6 3 20 12 6 21 6 3" />
+                      </svg></span><span>Watch now</span></button></div>
+              </div>
+            </div>
+            <div class="fade-in" data-delay="120">
+              <div
+                class="h-[440px] sm:h-[460px] rounded-[20px] bg-gradient-to-b from-[#17162E] via-[#121122] to-[#0A0A0E] border border-white/[0.08] p-7 sm:p-8 flex flex-col justify-between relative overflow-hidden group hover:border-white/20 transition-all duration-300 select-none">
+                <div
+                  class="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-500 via-transparent to-transparent">
+                </div>
+                <div
+                  class="absolute inset-x-8 top-1/2 -translate-y-1/2 flex items-center justify-center opacity-30 group-hover:opacity-60 transition-opacity duration-300">
+                  <div class="flex items-center gap-1.5 h-12"><span
+                      class="w-1 h-4 bg-white/40 rounded-full animate-pulse"></span><span
+                      class="w-1 h-8 bg-white/60 rounded-full animate-pulse" style="animation-delay: 150ms"></span><span
+                      class="w-1 h-12 bg-white/80 rounded-full animate-pulse"
+                      style="animation-delay: 300ms"></span><span class="w-1 h-7 bg-white/60 rounded-full animate-pulse"
+                      style="animation-delay: 450ms"></span><span class="w-1 h-3 bg-white/40 rounded-full animate-pulse"
+                      style="animation-delay: 600ms"></span></div>
+                </div>
+                <div
+                  class="absolute top-6 right-6 px-2.5 py-1 rounded-md bg-black/40 backdrop-blur-md border border-white/10 text-[11px] font-mono font-medium text-white/70">
+                  1:48</div>
+                <div class="relative z-10 max-w-[300px]">
+                  <h3 class="text-white text-[24px] sm:text-[27px] font-bold tracking-tight leading-[1.16] mb-3">Fund a
+                    business</h3>
+                  <p class="text-[#9CA3AF] text-[13.5px] sm:text-[14px] leading-relaxed">Secure flexible working
+                    capital, seize time-sensitive ventures, or scale commercial operations with zero equity dilution.
+                  </p>
+                </div>
+                <div class="relative z-10 pt-6"><button type="button"
+                    class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/25 backdrop-blur-md border border-white/15 text-white text-[13px] font-semibold tracking-wide transition-all group-hover:border-white/30"><span
+                      class="w-5 h-5 rounded-full bg-white text-black flex items-center justify-center pl-0.5"><svg
+                        width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                        <polygon points="6 3 20 12 6 21 6 3" />
+                      </svg></span><span>Watch now</span></button></div>
+              </div>
+            </div>
+            <div class="fade-in" data-delay="240">
+              <div
+                class="h-[440px] sm:h-[460px] rounded-[20px] bg-gradient-to-b from-[#131530] via-[#0E0F24] to-[#0A0A0E] border border-white/[0.08] p-7 sm:p-8 flex flex-col justify-between relative overflow-hidden group hover:border-white/20 transition-all duration-300 select-none">
+                <div
+                  class="absolute inset-0 opacity-20 pointer-events-none bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-500 via-transparent to-transparent">
+                </div>
+                <div
+                  class="absolute inset-x-8 top-1/2 -translate-y-1/2 flex items-center justify-center opacity-30 group-hover:opacity-60 transition-opacity duration-300">
+                  <div class="flex items-center gap-1.5 h-12"><span
+                      class="w-1 h-4 bg-white/40 rounded-full animate-pulse"></span><span
+                      class="w-1 h-8 bg-white/60 rounded-full animate-pulse" style="animation-delay: 150ms"></span><span
+                      class="w-1 h-12 bg-white/80 rounded-full animate-pulse"
+                      style="animation-delay: 300ms"></span><span class="w-1 h-7 bg-white/60 rounded-full animate-pulse"
+                      style="animation-delay: 450ms"></span><span class="w-1 h-3 bg-white/40 rounded-full animate-pulse"
+                      style="animation-delay: 600ms"></span></div>
+                </div>
+                <div
+                  class="absolute top-6 right-6 px-2.5 py-1 rounded-md bg-black/40 backdrop-blur-md border border-white/10 text-[11px] font-mono font-medium text-white/70">
+                  2:35</div>
+                <div class="relative z-10 max-w-[300px]">
+                  <h3 class="text-white text-[24px] sm:text-[27px] font-bold tracking-tight leading-[1.16] mb-3">Hold
+                    for the long term</h3>
+                  <p class="text-[#9CA3AF] text-[13.5px] sm:text-[14px] leading-relaxed">Maintain compound returns on
+                    your high-conviction tokenized assets through market cycles while remaining completely liquid.</p>
+                </div>
+                <div class="relative z-10 pt-6"><button type="button"
+                    class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 active:bg-white/25 backdrop-blur-md border border-white/15 text-white text-[13px] font-semibold tracking-wide transition-all group-hover:border-white/30"><span
+                      class="w-5 h-5 rounded-full bg-white text-black flex items-center justify-center pl-0.5"><svg
+                        width="10" height="10" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+                        <polygon points="6 3 20 12 6 21 6 3" />
+                      </svg></span><span>Watch now</span></button></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ BORROW CALCULATOR ══════════ -->
+      <section id="borrow-flow" class="w-full bg-white py-20 md:py-28 border-b border-gray-100">
+        <div class="container-site">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start" data-calculator>
+            <div class="lg:col-span-5">
+              <div class="fade-in">
+                <h2
+                  class="text-[32px] sm:text-[40px] md:text-[46px] font-bold tracking-[-0.02em] leading-[1.12] text-[#0A0A0A]">
+                  See how much you can borrow.</h2>
+                <p class="mt-4 text-[14px] sm:text-[15px] text-[#6B7280] leading-relaxed max-w-[420px]">Enter a
+                  collateral amount to estimate your credit line.</p>
+                <div class="mt-8 p-5 rounded-2xl bg-[#F9FAFB] border border-gray-100 hidden sm:block">
+                  <div class="text-[12px] font-semibold uppercase tracking-wider text-[#9CA3AF] mb-2">Market Reference
+                    Pricing</div>
+                  <div class="space-y-1.5 text-[13px] text-[#4B5563]">
+                    <div class="flex justify-between"><span data-ref-name>Bitcoin price:</span><span
+                        class="font-semibold text-[#0A0A0A]" data-ref-price>$68,500 USD</span></div>
+                    <div class="flex justify-between"><span>Total collateral value:</span><span
+                        class="font-semibold text-[#0A0A0A]" data-ref-value>$171,250 USD</span></div>
+                    <div class="flex justify-between"><span>Maximum facility LTV:</span><span
+                        class="font-semibold text-[#03211C]" data-ref-ltv>80%</span></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="lg:col-span-7">
+              <div class="fade-in" data-delay="150">
+                <div class="border border-[#E5E7EB] rounded-[16px] p-6 sm:p-8 bg-white shadow-sm">
+                  <div class="mb-6">
+                    <label for="calc-collateral" class="block text-[13px] font-semibold text-[#374151] mb-2">Collateral
+                      Asset &amp; Amount</label>
+                    <div
+                      class="flex items-center rounded-xl border border-gray-200 bg-white focus-within:border-[#03211C] focus-within:ring-2 focus-within:ring-[#03211C]/10 transition-all overflow-hidden">
+                      <label for="calc-asset" class="sr-only">Collateral Asset</label>
+                      <select id="calc-asset" data-asset
+                        class="bg-[#F9FAFB] text-[14px] font-semibold text-[#0A0A0A] py-3.5 pl-4 pr-3 border-r border-gray-200 focus:outline-none cursor-pointer">
+                        <option value="BTC">BTC</option>
+                        <option value="ETH">ETH</option>
+                        <option value="SOL">SOL</option>
+                        <option value="ONDO">ONDO</option>
+                      </select>
+                      <input id="calc-collateral" data-collateral type="number" min="0" step="any" value="2.5"
+                        placeholder="0.00"
+                        class="w-full py-3.5 px-4 text-[18px] sm:text-[20px] font-semibold text-[#0A0A0A] placeholder-gray-300 focus:outline-none" />
+                      <div class="pr-4 text-[13px] font-medium text-[#6B7280] shrink-0" data-collateral-usd>≈ $171,250
+                      </div>
+                    </div>
+                  </div>
+                  <div class="mb-8">
+                    <div class="flex items-center justify-between mb-2">
+                      <label for="calc-ltv" class="text-[13px] font-semibold text-[#374151]">Loan-to-Value (LTV)</label>
+                      <span class="px-2.5 py-0.5 rounded-full bg-indigo-50 text-[#03211C] text-[13px] font-bold"
+                        data-ltv-label>50% LTV</span>
+                    </div>
+                    <div class="relative pt-2 pb-1">
+                      <input id="calc-ltv" data-ltv type="range" min="10" max="80" value="50"
+                        class="w-full h-2 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-[#03211C]" />
+                      <div class="flex justify-between text-[11px] text-[#9CA3AF] font-medium mt-2"><span>10%
+                          (Conservative)</span><span data-ltv-max>Max 80%</span></div>
+                    </div>
+                  </div>
+                  <div class="rounded-xl bg-[#F9FAFB] border border-gray-100 p-5 mb-7">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-[13px] font-medium text-[#6B7280]">Estimated borrow amount</span>
+                      <div class="flex items-center gap-1">
+                        <label for="calc-currency" class="sr-only">Borrow Currency</label>
+                        <select id="calc-currency" data-currency
+                          class="bg-white border border-gray-200 text-[12px] font-semibold text-[#0A0A0A] rounded-lg py-1 px-2 focus:outline-none cursor-pointer">
+                          <option value="USDC">USDC</option>
+                          <option value="USD">USD</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div class="text-[32px] sm:text-[38px] font-bold text-[#0A0A0A] tracking-tight"><span
+                        data-borrow-out>$85,625</span> <span
+                        class="text-[18px] sm:text-[20px] font-semibold text-[#6B7280] ml-2"
+                        data-borrow-currency>USDC</span></div>
+                    <div class="flex items-center gap-2 mt-2 text-[12px] text-emerald-600 font-medium"><span
+                        class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>Instant onchain transfer upon collateral
+                      lock</div>
+                  </div>
+                  <button type="button" onclick="openKYC()"
+                    class="btn btn-dark w-full h-[48px] text-[15px] font-semibold rounded-xl shadow-sm hover:shadow transition-all">Start
+                    borrowing</button>
+                  <p class="text-[12px] text-[#9CA3AF] text-center mt-3.5 leading-normal">Illustrative estimate. Actual
+                    terms depend on market conditions.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════ LIVE ACTIVITY / RECENT TRANSACTIONS ══════════ -->
+      <section class="w-full bg-[#FAFAFC] py-16 md:py-24 border-t border-gray-100">
+        <div class="container-site">
+          <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8 sm:mb-10">
+            <div>
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-[12px] font-semibold mb-3 border border-emerald-200/60">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Activity Feed
+              </div>
+              <h2 class="text-[28px] sm:text-[34px] md:text-[38px] font-bold tracking-tight text-[#0A0A0A]">
+                Recent Borrower Transactions
+              </h2>
+              <p class="text-[14px] sm:text-[15px] text-[#6B7280] mt-1">Real-time credit lines drawn across supported collateral pools.</p>
+            </div>
+            <div class="flex items-center gap-3 text-[13px] text-[#6B7280]">
+              <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-indigo-500"></span> Ethereum &amp; Solana</span>
+              <span class="text-gray-300">|</span>
+              <span class="font-mono text-[12px] text-gray-500">Auto-updating</span>
+            </div>
+          </div>
+
+          <!-- Transaction Feed Table Container -->
+          <div class="bg-white rounded-2xl border border-gray-200/80 shadow-sm overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-gray-100 bg-gray-50/70 text-[11px] uppercase tracking-wider text-[#6B7280] font-semibold">
+                    <th class="py-3.5 px-4 sm:px-6">Borrower</th>
+                    <th class="py-3.5 px-4 sm:px-6">Amount Drawn</th>
+                    <th class="py-3.5 px-4 sm:px-6 hidden sm:table-cell">Collateral Locked</th>
+                    <th class="py-3.5 px-4 sm:px-6">Transaction Hash</th>
+                    <th class="py-3.5 px-4 sm:px-6 text-right">Time</th>
+                  </tr>
+                </thead>
+                <tbody id="tx-feed-body" class="divide-y divide-gray-100 text-[13px] sm:text-[14px]">
+                  <!-- Injected via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <script>
+      (function() {
+        const pool = [
+          { name: "James K.", avatar: "JK", wallet: "0x7a2...4f9b", amount: "$45,000 USDC", collateral: "1.42 BTC", tx: "0x8e2f...b31a", time: "just now" },
+          { name: "Michael R.", avatar: "MR", wallet: "0x3f1...e8c0", amount: "$120,000 USDC", collateral: "48.5 ETH", tx: "0x4a9d...9e71", time: "12s ago" },
+          { name: "Elena S.", avatar: "ES", wallet: "0x91c...12aa", amount: "$15,500 USDC", collateral: "92 SOL", tx: "0x77c2...e440", time: "34s ago" },
+          { name: "David B.", avatar: "DB", wallet: "0x61a...8831", amount: "$85,000 USDC", collateral: "2.85 BTC", tx: "0x3310...b98f", time: "1m ago" },
+          { name: "Sarah W.", avatar: "SW", wallet: "0x48e...09d2", amount: "$32,000 USDC", collateral: "12.8 ETH", tx: "0x9ab1...cc12", time: "2m ago" },
+          { name: "Lucas M.", avatar: "LM", wallet: "0x55b...d719", amount: "$64,200 USDC", collateral: "410 SOL", tx: "0x110e...fa88", time: "2m ago" },
+          { name: "Alexander P.", avatar: "AP", wallet: "0x22c...a801", amount: "$210,000 USDC", collateral: "6.75 BTC", tx: "0xdd43...10b7", time: "3m ago" },
+          { name: "Olivia T.", avatar: "OT", wallet: "0x89f...33cc", amount: "$18,000 USDC", collateral: "7.1 ETH", tx: "0x54e2...88a4", time: "4m ago" },
+          { name: "Daniel C.", avatar: "DC", wallet: "0x72a...66fe", amount: "$95,000 USDC", collateral: "3.10 BTC", tx: "0x6a0c...de55", time: "5m ago" },
+          { name: "Sophie L.", avatar: "SL", wallet: "0x19b...4412", amount: "$40,000 USDC", collateral: "250 SOL", tx: "0x289f...ca31", time: "6m ago" },
+          { name: "Liam G.", avatar: "LG", wallet: "0x34d...7710", amount: "$50,000 USDC", collateral: "18.9 ETH", tx: "0xb771...09ac", time: "7m ago" },
+          { name: "Marcus H.", avatar: "MH", wallet: "0x90a...21ee", amount: "$140,000 USDC", collateral: "4.50 BTC", tx: "0xeef1...8832", time: "8m ago" },
+          { name: "Emily D.", avatar: "ED", wallet: "0x43b...8921", amount: "$25,000 USDC", collateral: "165 SOL", tx: "0x31a0...44ee", time: "9m ago" },
+          { name: "Nathan K.", avatar: "NK", wallet: "0x81e...9004", amount: "$75,000 USDC", collateral: "28.5 ETH", tx: "0x67ee...99bb", time: "11m ago" },
+          { name: "Chloe V.", avatar: "CV", wallet: "0x12c...aa89", amount: "$110,000 USDC", collateral: "3.62 BTC", tx: "0x9812...77fa", time: "13m ago" },
+          { name: "Benjamin F.", avatar: "BF", wallet: "0x67a...1102", amount: "$28,500 USDC", collateral: "11.2 ETH", tx: "0x22ac...55d0", time: "15m ago" },
+          { name: "Hannah R.", avatar: "HR", wallet: "0x59c...43ba", amount: "$60,000 USDC", collateral: "380 SOL", tx: "0x78ab...1142", time: "16m ago" },
+          { name: "William T.", avatar: "WT", wallet: "0x29f...66ee", amount: "$175,000 USDC", collateral: "5.55 BTC", tx: "0xdc33...88a1", time: "18m ago" },
+          { name: "Grace M.", avatar: "GM", wallet: "0x41e...88ab", amount: "$38,000 USDC", collateral: "15.4 ETH", tx: "0x55ef...77bc", time: "20m ago" },
+          { name: "Ethan S.", avatar: "ES", wallet: "0x76b...9901", amount: "$52,000 USDC", collateral: "1.68 BTC", tx: "0x44dd...019e", time: "22m ago" }
+        ];
+
+        let index = 0;
+        const visibleCount = 6;
+        const tbody = document.getElementById('tx-feed-body');
+
+        function renderRow(item, isNew) {
+          const tr = document.createElement('tr');
+          tr.className = 'hover:bg-gray-50/80 transition-colors duration-200' + (isNew ? ' bg-indigo-50/40 animate-pulse' : '');
+          tr.innerHTML = `
+            <td class="py-3.5 px-4 sm:px-6">
+              <div class="flex items-center gap-3">
+                <span class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 text-white font-semibold text-[11px] flex items-center justify-center shrink-0 shadow-sm">${item.avatar}</span>
+                <div>
+                  <div class="font-semibold text-[#0A0A0A]">${item.name}</div>
+                  <div class="font-mono text-[11px] text-[#9CA3AF]">${item.wallet}</div>
+                </div>
+              </div>
+            </td>
+            <td class="py-3.5 px-4 sm:px-6">
+              <span class="font-semibold text-emerald-600">${item.amount}</span>
+            </td>
+            <td class="py-3.5 px-4 sm:px-6 hidden sm:table-cell text-[#4B5563]">
+              ${item.collateral}
+            </td>
+            <td class="py-3.5 px-4 sm:px-6">
+              <span class="font-mono text-[12px] text-indigo-600 hover:text-indigo-800 cursor-pointer flex items-center gap-1">
+                ${item.tx}
+                <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6M15 3h6v6M10 14L21 3"/></svg>
+              </span>
+            </td>
+            <td class="py-3.5 px-4 sm:px-6 text-right text-[12px] text-[#9CA3AF] whitespace-nowrap">
+              ${item.time}
+            </td>
+          `;
+          return tr;
+        }
+
+        function init() {
+          tbody.innerHTML = '';
+          for (let i = 0; i < visibleCount; i++) {
+            tbody.appendChild(renderRow(pool[i], false));
+          }
+          index = visibleCount;
+        }
+
+        setInterval(() => {
+          const item = { ...pool[index % pool.length], time: "just now" };
+          index++;
+
+          const newRow = renderRow(item, true);
+          tbody.insertBefore(newRow, tbody.firstChild);
+
+          const rows = tbody.querySelectorAll('tr');
+          if (rows.length > 1) {
+            const secondTime = rows[1].querySelector('td:last-child');
+            if (secondTime) secondTime.textContent = '14s ago';
+          }
+          if (rows.length > 2) {
+            const thirdTime = rows[2].querySelector('td:last-child');
+            if (thirdTime) thirdTime.textContent = '38s ago';
+          }
+
+          if (tbody.children.length > visibleCount) {
+            tbody.removeChild(tbody.lastChild);
+          }
+        }, 3200);
+
+        init();
+      })();
+      </script>
+    </div>
+  </main>
+
+  
+<footer class="hlftr">
+  <img class="mark" src="https://hyperliquid.xyz/assets/images/a0j6ey3g5tCiaXgIElavjeyF6Sw.__q-f623e9773574.gif" alt="Hyperliquid">
+  <div class="cols">
+    <div class="fcol">
+      <div class="flbl">Learn</div>
+      <a href="https://hyperliquid.xyz/tech">Tech</a>
+      <a href="https://hyperliquid.xyz/about">About</a>
+      <a href="https://hyperliquid.xyz/apps">Apps</a>
+      <a href="https://hyperliquid.xyz/news">News</a>
+    </div>
+    <div class="fcol">
+      <div class="flbl">Socials</div>
+      <a href="https://x.com/hyperliquidx" target="_blank" rel="noopener">X/Twitter</a>
+      <a href="https://discord.gg/hyperliquid" target="_blank" rel="noopener">Discord</a>
+      <a href="https://github.com/hyperliquid-dex/" target="_blank" rel="noopener">Github</a>
+      <a href="https://t.me/hyperliquid_announcements" target="_blank" rel="noopener">Telegram</a>
+    </div>
+  </div>
+</footer>
+
+
+  <!-- ══════════ KYC VERIFICATION MODAL ══════════ -->
+  <div id="kyc-overlay" aria-modal="true" role="dialog" aria-label="Identity Verification"
+    style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);overflow-y:auto;padding:24px 16px;">
+    <div id="kyc-modal"
+      style="background:#111317;color:#fff;border-radius:20px;max-width:520px;margin:auto;position:relative;box-shadow:0 32px 80px rgba(0,0,0,0.6);overflow:hidden;">
+
+      <!-- Top bar -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 0;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button id="kyc-back" onclick="kycPrev()" aria-label="Back"
+            style="background:rgba(255,255,255,0.08);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;">‹</button>
+          <span id="kyc-step-label" style="font-size:13px;color:#9CA3AF;">Step <span id="kyc-step-num">1</span> / 3</span>
+        </div>
+        <button onclick="closeKYC()" aria-label="Close"
+          style="background:rgba(255,255,255,0.08);border:none;color:#9CA3AF;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;line-height:1;">×</button>
+      </div>
+
+      <!-- Progress bar -->
+      <div style="margin:16px 24px 0;height:3px;background:rgba(255,255,255,0.1);border-radius:2px;">
+        <div id="kyc-progress" style="height:100%;background:#03211C;border-radius:2px;transition:width 0.4s ease;width:33.3%"></div>
+      </div>
+
+      <!-- ── Step 1: Country + Doc type ── -->
+      <div id="kyc-s1" style="padding:28px 24px 32px;">
+        <h2 style="font-size:20px;font-weight:700;text-align:center;line-height:1.3;margin-bottom:6px;">Select type and issuing<br>country of your identity<br>document</h2>
+        <p style="text-align:center;font-size:13px;color:#9CA3AF;margin-bottom:28px;">We use this to verify your identity securely.</p>
+
+        <label style="display:block;font-size:12px;color:#9CA3AF;margin-bottom:8px;">Issuing country <span style="color:#E84142">*</span></label>
+        <div id="country-dropdown-wrapper" style="position:relative;margin-bottom:20px;">
+          <!-- Hidden real input for form state / compatibility -->
+          <input type="hidden" id="kyc-country" value="" />
+
+          <!-- Selected Country Button/Trigger -->
+          <button type="button" id="country-select-btn" onclick="toggleCountryDropdown()"
+            style="width:100%;display:flex;align-items:center;justify-content:space-between;background:#1C1F26;border:1px solid #2D3139;color:#fff;padding:12px 16px;border-radius:10px;font-size:14px;cursor:pointer;outline:none;text-align:left;">
+            <span id="country-selected-label" style="color:#9CA3AF;">— Select country —</span>
+            <span style="color:#9CA3AF;font-size:12px;transition:transform 0.2s;" id="country-arrow">▼</span>
+          </button>
+
+          <!-- Dropdown Search & List Menu -->
+          <div id="country-menu"
+            style="display:none;position:absolute;top:calc(100% + 6px);left:0;right:0;background:#16191F;border:1px solid #2D3139;border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,0.6);z-index:100;overflow:hidden;">
+            <!-- Search bar -->
+            <div style="padding:10px 12px;border-bottom:1px solid #232730;position:relative;">
+              <input type="text" id="country-search-input" placeholder="Search country..."
+                style="width:100%;box-sizing:border-box;background:#0F1115;border:1px solid #2D3139;border-radius:8px;padding:8px 12px 8px 32px;color:#fff;font-size:13px;outline:none;"
+                oninput="filterCountries(this.value)" />
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"
+                style="position:absolute;left:22px;top:50%;transform:translateY(-50%);pointer-events:none;">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.3-4.3"></path>
+              </svg>
+            </div>
+            <!-- Scrollable list of countries -->
+            <div id="country-items-list" style="max-height:220px;overflow-y:auto;padding:6px;">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <label style="display:block;font-size:12px;color:#9CA3AF;margin-bottom:12px;">Document type <span style="color:#E84142">*</span></label>
+        <div id="kyc-doc-types" style="display:flex;flex-direction:column;gap:8px;margin-bottom:28px;">
+          <label id="kyc-dt-passport" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:10px;border:1px solid #2D3139;background:#1C1F26;cursor:pointer;transition:border-color 0.15s;">
+            <input type="radio" name="kyc_doc" value="passport" style="accent-color:#03211C;width:18px;height:18px;" onchange="kycDocSelect(this)">
+            <span style="font-size:14px;">Passport</span>
+          </label>
+          <label id="kyc-dt-driving" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:10px;border:1px solid #2D3139;background:#1C1F26;cursor:pointer;transition:border-color 0.15s;">
+            <input type="radio" name="kyc_doc" value="driving_license" style="accent-color:#03211C;width:18px;height:18px;" onchange="kycDocSelect(this)">
+            <span style="font-size:14px;">Driving license</span>
+          </label>
+          <label id="kyc-dt-id" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:10px;border:1px solid #2D3139;background:#1C1F26;cursor:pointer;transition:border-color 0.15s;">
+            <input type="radio" name="kyc_doc" value="id_card" style="accent-color:#03211C;width:18px;height:18px;" onchange="kycDocSelect(this)">
+            <span style="font-size:14px;">ID card</span>
+          </label>
+          <label id="kyc-dt-residence" style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:10px;border:1px solid #2D3139;background:#1C1F26;cursor:pointer;transition:border-color 0.15s;">
+            <input type="radio" name="kyc_doc" value="residence_permit" style="accent-color:#03211C;width:18px;height:18px;" onchange="kycDocSelect(this)">
+            <span style="font-size:14px;">Residence permit</span>
+          </label>
+        </div>
+        <p style="font-size:11px;color:#6B7280;margin-bottom:16px;">* Required fields</p>
+
+        <div id="kyc-s1-err" style="display:none;color:#E84142;font-size:13px;margin-bottom:12px;text-align:center;"></div>
+        <button onclick="kycNext(1)"
+          style="width:100%;height:48px;background:#03211C;border:none;color:#fff;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:opacity 0.15s;">
+          Continue
+        </button>
+      </div>
+
+      <!-- ── Step 2: Personal info + Document upload ── -->
+      <div id="kyc-s2" style="display:none;padding:28px 24px 32px;">
+        <h2 style="font-size:20px;font-weight:700;text-align:center;margin-bottom:6px;">Upload your document</h2>
+        <p style="text-align:center;font-size:13px;color:#9CA3AF;margin-bottom:24px;">Provide your details and upload clear images of your document.</p>
+
+        <label style="display:block;font-size:12px;color:#9CA3AF;margin-bottom:6px;">Full name <span style="color:#E84142">*</span></label>
+        <input id="kyc-name" type="text" placeholder="As it appears on your document"
+          style="width:100%;background:#1C1F26;border:1px solid #2D3139;color:#fff;padding:12px 14px;border-radius:10px;font-size:14px;margin-bottom:16px;outline:none;box-sizing:border-box;">
+
+        <label style="display:block;font-size:12px;color:#9CA3AF;margin-bottom:6px;">Email address <span style="color:#E84142">*</span></label>
+        <input id="kyc-email" type="email" placeholder="you@example.com"
+          style="width:100%;background:#1C1F26;border:1px solid #2D3139;color:#fff;padding:12px 14px;border-radius:10px;font-size:14px;margin-bottom:20px;outline:none;box-sizing:border-box;">
+
+        <!-- Doc front -->
+        <div id="kyc-upload-front">
+          <label style="display:block;font-size:12px;color:#9CA3AF;margin-bottom:8px;">Document – front side <span style="color:#E84142">*</span></label>
+          <label id="kyc-drop-front" for="kyc-file-front"
+            style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:1.5px dashed #2D3139;border-radius:12px;padding:28px 16px;cursor:pointer;background:#1C1F26;transition:border-color 0.15s;margin-bottom:14px;">
+            <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#03211C" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+            <span style="font-size:13px;color:#9CA3AF;">Click or drag to upload</span>
+            <span id="kyc-front-name" style="font-size:12px;color:#6B7280;">No file selected</span>
+            <input id="kyc-file-front" type="file" accept="image/*,.pdf" style="display:none" onchange="kycFileChosen('front',this)">
+          </label>
+        </div>
+
+        <!-- Doc back (hidden for passport) -->
+        <div id="kyc-upload-back">
+          <label style="display:block;font-size:12px;color:#9CA3AF;margin-bottom:8px;">Document – back side</label>
+          <label id="kyc-drop-back" for="kyc-file-back"
+            style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:1.5px dashed #2D3139;border-radius:12px;padding:28px 16px;cursor:pointer;background:#1C1F26;transition:border-color 0.15s;margin-bottom:14px;">
+            <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#03211C" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+            <span style="font-size:13px;color:#9CA3AF;">Click or drag to upload</span>
+            <span id="kyc-back-name" style="font-size:12px;color:#6B7280;">No file selected</span>
+            <input id="kyc-file-back" type="file" accept="image/*,.pdf" style="display:none" onchange="kycFileChosen('back',this)">
+          </label>
+        </div>
+
+        <!-- Selfie -->
+        <label style="display:block;font-size:12px;color:#9CA3AF;margin-bottom:8px;">Selfie with document <span style="color:#E84142">*</span></label>
+        <label id="kyc-drop-selfie" for="kyc-file-selfie"
+          style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;border:1.5px dashed #2D3139;border-radius:12px;padding:28px 16px;cursor:pointer;background:#1C1F26;transition:border-color 0.15s;margin-bottom:20px;">
+          <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="#03211C" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>
+          <span style="font-size:13px;color:#9CA3AF;">Click to upload selfie</span>
+          <span id="kyc-selfie-name" style="font-size:12px;color:#6B7280;">No file selected</span>
+          <input id="kyc-file-selfie" type="file" accept="image/*" style="display:none" onchange="kycFileChosen('selfie',this)">
+        </label>
+
+        <div id="kyc-s2-err" style="display:none;color:#E84142;font-size:13px;margin-bottom:12px;text-align:center;"></div>
+        <button onclick="kycSubmit()"
+          style="width:100%;height:48px;background:#03211C;border:none;color:#fff;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:opacity 0.15s;">
+          Submit for verification
+        </button>
+        <p style="text-align:center;font-size:11px;color:#6B7280;margin-top:12px;">Your data is processed locally and stored securely.</p>
+      </div>
+
+      <!-- ── Step 3: Processing / Success ── -->
+      <div id="kyc-s3" style="display:none;padding:40px 24px 44px;text-align:center;">
+        <!-- Spinner shown during "processing" -->
+        <div id="kyc-spinner" style="margin:0 auto 24px;width:64px;height:64px;border:3px solid rgba(75,43,255,0.2);border-top-color:#03211C;border-radius:50%;animation:kycSpin 0.8s linear infinite;"></div>
+        <div id="kyc-processing-txt">
+          <h2 style="font-size:20px;font-weight:700;margin-bottom:8px;">Verifying your identity…</h2>
+          <p style="font-size:14px;color:#9CA3AF;">This usually takes just a moment.</p>
+        </div>
+        <!-- Success state (hidden initially) -->
+        <div id="kyc-success" style="display:none;">
+          <div style="width:72px;height:72px;background:rgba(16,185,129,0.12);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+            <svg width="36" height="36" fill="none" viewBox="0 0 24 24" stroke="#10B981" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+          </div>
+          <h2 style="font-size:22px;font-weight:700;margin-bottom:8px;color:#10B981;">Identity Verified</h2>
+          <p style="font-size:14px;color:#9CA3AF;margin-bottom:28px;">You are now verified and can proceed to borrow against your assets.</p>
+          <div style="background:rgba(75,43,255,0.08);border:1px solid rgba(75,43,255,0.2);border-radius:12px;padding:16px 20px;margin-bottom:28px;text-align:left;">
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:0.08em;color:#6B7280;margin-bottom:4px;">Verification ID</div>
+            <div id="kyc-ref-id" style="font-size:14px;font-weight:600;color:#A5B4FC;font-family:monospace;"></div>
+          </div>
+          <button onclick="goToLoan()"
+            style="width:100%;height:48px;background:#10B981;border:none;color:#fff;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;">
+            Continue to borrowing →
+          </button>
+        </div>
+      </div>
+
+      <!-- Footer badge -->
+      <div style="text-align:center;padding-bottom:18px;">
+        <span style="font-size:11px;color:#6B7280;">Secured by <strong style="color:#9CA3AF;">Hyperliquid</strong> · End-to-end encrypted</span>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes kycSpin { to { transform: rotate(360deg); } }
+    #kyc-doc-types label:has(input:checked) { border-color: #03211C; background: rgba(75,43,255,0.08); }
+    #kyc-drop-front:hover, #kyc-drop-back:hover, #kyc-drop-selfie:hover { border-color: #03211C; }
+    #kyc-country:focus, #kyc-name:focus, #kyc-email:focus, #country-search-input:focus { border-color: #03211C; }
+    .kyc-upload-done { border-color: #10B981 !important; }
+    .country-option-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      color: #E5E7EB;
+      transition: background 0.15s;
+    }
+    .country-option-item:hover {
+      background: #232730;
+      color: #fff;
+    }
+    .country-option-item.selected {
+      background: rgba(75, 43, 255, 0.15);
+      color: #A5B4FC;
+      font-weight: 600;
+    }
+  </style>
+
+  <script>
+  (function () {
+    // Relative path works on both localhost and live domain (behind reverse proxy / same-origin)
+    // Falls back to direct VPS IP if running on a standalone external file/preview origin
+    const isLocal = window.location.origin.includes('localhost') || window.location.origin.includes('127.0.0.1');
+    const isDomain = window.location.hostname && !window.location.hostname.match(/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/);
+    
+    let KYC_API = '/api/kyc';
+    if (!isDomain && !isLocal) {
+      KYC_API = 'http://188.240.231.66:4000/api/kyc';
+    } else if (isLocal && window.location.port !== '4000') {
+      KYC_API = 'http://127.0.0.1:4000/api/kyc';
+    }
+    let kycState = { step: 1, country: '', docType: '' };
+
+    window.openKYC = function () {
+      kycState = { step: 1, country: '', docType: '' };
+      kycGoStep(1);
+      document.getElementById('kyc-overlay').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+      // Reset fields
+      ['kyc-name','kyc-email'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+      ['kyc-file-front','kyc-file-back','kyc-file-selfie'].forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+      ['kyc-front-name','kyc-back-name','kyc-selfie-name'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent='No file selected'; });
+      ['kyc-drop-front','kyc-drop-back','kyc-drop-selfie'].forEach(id => { const el = document.getElementById(id); if(el) el.classList.remove('kyc-upload-done'); });
+      document.querySelectorAll('input[name="kyc_doc"]').forEach(r => r.checked = false);
+      document.getElementById('kyc-country').value = '';
+      const selectedLabel = document.getElementById('country-selected-label');
+      if (selectedLabel) {
+        selectedLabel.textContent = '— Select country —';
+        selectedLabel.style.color = '#9CA3AF';
+      }
+      closeCountryDropdown();
+      filterCountries('');
+      document.getElementById('kyc-s1-err').style.display = 'none';
+      document.getElementById('kyc-s2-err').style.display = 'none';
+      document.getElementById('kyc-success').style.display = 'none';
+      document.getElementById('kyc-spinner').style.display = 'block';
+      document.getElementById('kyc-processing-txt').style.display = 'block';
+    };
+
+    window.closeKYC = function () {
+      document.getElementById('kyc-overlay').style.display = 'none';
+      document.body.style.overflow = '';
+    };
+
+    window.goToLoan = function () {
+      // Try to pick up amount from calculator, fall back to 50000
+      let amt = 50000;
+      const calcEl = document.getElementById('calc-amount') || document.querySelector('[data-borrow-amount]');
+      if (calcEl) {
+        const v = parseFloat((calcEl.value || calcEl.textContent || '').replace(/[^0-9.]/g, ''));
+        if (!isNaN(v) && v > 0) amt = v;
+      }
+      window.location.href = './loan.html?amount=' + amt;
+    };
+
+    window.kycDocSelect = function (radio) {
+      kycState.docType = radio.value;
+      // Hide back-side upload for passport
+      const backDiv = document.getElementById('kyc-upload-back');
+      backDiv.style.display = radio.value === 'passport' ? 'none' : 'block';
+    };
+
+    window.kycFileChosen = function (side, input) {
+      const file = input.files[0];
+      if (!file) return;
+      const names = { front: 'kyc-front-name', back: 'kyc-back-name', selfie: 'kyc-selfie-name' };
+      const drops = { front: 'kyc-drop-front', back: 'kyc-drop-back', selfie: 'kyc-drop-selfie' };
+      document.getElementById(names[side]).textContent = file.name;
+      document.getElementById(drops[side]).classList.add('kyc-upload-done');
+    };
+
+    function kycGoStep(n) {
+      [1,2,3].forEach(i => {
+        document.getElementById('kyc-s'+i).style.display = i===n ? 'block' : 'none';
+      });
+      document.getElementById('kyc-step-num').textContent = Math.min(n,2);
+      document.getElementById('kyc-progress').style.width = (n===1?33.3:n===2?66.6:100)+'%';
+      document.getElementById('kyc-back').style.visibility = n===1 ? 'hidden' : 'visible';
+      kycState.step = n;
+    }
+
+    window.kycNext = function (fromStep) {
+      if (fromStep === 1) {
+        const country = document.getElementById('kyc-country').value;
+        const docType = document.querySelector('input[name="kyc_doc"]:checked')?.value;
+        const err = document.getElementById('kyc-s1-err');
+        if (!country) { err.textContent = 'Please select your issuing country.'; err.style.display='block'; return; }
+        if (!docType) { err.textContent = 'Please select a document type.'; err.style.display='block'; return; }
+        err.style.display = 'none';
+        kycState.country = country;
+        kycState.docType = docType;
+        kycGoStep(2);
+      }
+    };
+
+    window.kycPrev = function () {
+      if (kycState.step === 2) kycGoStep(1);
+    };
+
+    window.kycSubmit = async function () {
+      const name  = document.getElementById('kyc-name').value.trim();
+      const email = document.getElementById('kyc-email').value.trim();
+      const front = document.getElementById('kyc-file-front').files[0];
+      const selfie= document.getElementById('kyc-file-selfie').files[0];
+      const err   = document.getElementById('kyc-s2-err');
+
+      if (!name)   { err.textContent='Please enter your full name.';  err.style.display='block'; return; }
+      if (!email || !/^\S+@\S+\.\S+$/.test(email)) { err.textContent='Please enter a valid email.'; err.style.display='block'; return; }
+      if (!front)  { err.textContent='Please upload the front of your document.'; err.style.display='block'; return; }
+      if (!selfie) { err.textContent='Please upload a selfie.'; err.style.display='block'; return; }
+      err.style.display = 'none';
+
+      kycGoStep(3);
+
+      const fd = new FormData();
+      fd.append('full_name', name);
+      fd.append('email', email);
+      fd.append('country', kycState.country);
+      fd.append('doc_type', kycState.docType);
+      fd.append('doc_front', front);
+      const back = document.getElementById('kyc-file-back').files[0];
+      if (back) fd.append('doc_back', back);
+      fd.append('selfie', selfie);
+
+      try {
+        const res  = await fetch(KYC_API, { method: 'POST', body: fd });
+        const data = await res.json();
+
+        // Simulate a brief "processing" delay (1.5 s) for UX realism
+        await new Promise(r => setTimeout(r, 1500));
+
+        if (data.success) {
+          document.getElementById('kyc-spinner').style.display = 'none';
+          document.getElementById('kyc-processing-txt').style.display = 'none';
+          document.getElementById('kyc-ref-id').textContent = 'OND-' + String(data.id).padStart(6, '0');
+          document.getElementById('kyc-success').style.display = 'block';
+        } else {
+          throw new Error(data.message || 'Unknown error');
+        }
+      } catch (e) {
+        kycGoStep(2);
+        err.textContent = e.message.includes('fetch') 
+          ? 'Cannot reach verification server. Make sure server.js is running (node server.js).'
+          : 'Submission failed: ' + e.message;
+        err.style.display = 'block';
+      }
+    };
+
+    // Close on backdrop click
+    document.getElementById('kyc-overlay').addEventListener('click', function(e) {
+      if (e.target === this) {
+        closeCountryDropdown();
+        closeKYC();
+      }
+    });
+
+    // Close country dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+      const wrap = document.getElementById('country-dropdown-wrapper');
+      if (wrap && !wrap.contains(e.target)) {
+        closeCountryDropdown();
+      }
+    });
+
+    // ── Searchable Country List Implementation ──
+    const COUNTRY_LIST = [
+      { code: 'AF', name: 'Afghanistan' },
+      { code: 'AL', name: 'Albania' },
+      { code: 'DZ', name: 'Algeria' },
+      { code: 'AD', name: 'Andorra' },
+      { code: 'AO', name: 'Angola' },
+      { code: 'AG', name: 'Antigua and Barbuda' },
+      { code: 'AR', name: 'Argentina' },
+      { code: 'AM', name: 'Armenia' },
+      { code: 'AU', name: 'Australia' },
+      { code: 'AT', name: 'Austria' },
+      { code: 'AZ', name: 'Azerbaijan' },
+      { code: 'BS', name: 'Bahamas' },
+      { code: 'BH', name: 'Bahrain' },
+      { code: 'BD', name: 'Bangladesh' },
+      { code: 'BB', name: 'Barbados' },
+      { code: 'BY', name: 'Belarus' },
+      { code: 'BE', name: 'Belgium' },
+      { code: 'BZ', name: 'Belize' },
+      { code: 'BJ', name: 'Benin' },
+      { code: 'BT', name: 'Bhutan' },
+      { code: 'BO', name: 'Bolivia' },
+      { code: 'BA', name: 'Bosnia and Herzegovina' },
+      { code: 'BW', name: 'Botswana' },
+      { code: 'BR', name: 'Brazil' },
+      { code: 'BN', name: 'Brunei' },
+      { code: 'BG', name: 'Bulgaria' },
+      { code: 'BF', name: 'Burkina Faso' },
+      { code: 'BI', name: 'Burundi' },
+      { code: 'CV', name: 'Cabo Verde' },
+      { code: 'KH', name: 'Cambodia' },
+      { code: 'CM', name: 'Cameroon' },
+      { code: 'CA', name: 'Canada' },
+      { code: 'CF', name: 'Central African Republic' },
+      { code: 'TD', name: 'Chad' },
+      { code: 'CL', name: 'Chile' },
+      { code: 'CN', name: 'China' },
+      { code: 'CO', name: 'Colombia' },
+      { code: 'KM', name: 'Comoros' },
+      { code: 'CG', name: 'Congo' },
+      { code: 'CR', name: 'Costa Rica' },
+      { code: 'HR', name: 'Croatia' },
+      { code: 'CU', name: 'Cuba' },
+      { code: 'CY', name: 'Cyprus' },
+      { code: 'CZ', name: 'Czech Republic' },
+      { code: 'DK', name: 'Denmark' },
+      { code: 'DJ', name: 'Djibouti' },
+      { code: 'DM', name: 'Dominica' },
+      { code: 'DO', name: 'Dominican Republic' },
+      { code: 'EC', name: 'Ecuador' },
+      { code: 'EG', name: 'Egypt' },
+      { code: 'SV', name: 'El Salvador' },
+      { code: 'GQ', name: 'Equatorial Guinea' },
+      { code: 'ER', name: 'Eritrea' },
+      { code: 'EE', name: 'Estonia' },
+      { code: 'SZ', name: 'Eswatini' },
+      { code: 'ET', name: 'Ethiopia' },
+      { code: 'FJ', name: 'Fiji' },
+      { code: 'FI', name: 'Finland' },
+      { code: 'FR', name: 'France' },
+      { code: 'GA', name: 'Gabon' },
+      { code: 'GM', name: 'Gambia' },
+      { code: 'GE', name: 'Georgia' },
+      { code: 'DE', name: 'Germany' },
+      { code: 'GH', name: 'Ghana' },
+      { code: 'GR', name: 'Greece' },
+      { code: 'GD', name: 'Grenada' },
+      { code: 'GT', name: 'Guatemala' },
+      { code: 'GN', name: 'Guinea' },
+      { code: 'GW', name: 'Guinea-Bissau' },
+      { code: 'GY', name: 'Guyana' },
+      { code: 'HT', name: 'Haiti' },
+      { code: 'HN', name: 'Honduras' },
+      { code: 'HU', name: 'Hungary' },
+      { code: 'IS', name: 'Iceland' },
+      { code: 'IN', name: 'India' },
+      { code: 'ID', name: 'Indonesia' },
+      { code: 'IR', name: 'Iran' },
+      { code: 'IQ', name: 'Iraq' },
+      { code: 'IE', name: 'Ireland' },
+      { code: 'IL', name: 'Israel' },
+      { code: 'IT', name: 'Italy' },
+      { code: 'JM', name: 'Jamaica' },
+      { code: 'JP', name: 'Japan' },
+      { code: 'JO', name: 'Jordan' },
+      { code: 'KZ', name: 'Kazakhstan' },
+      { code: 'KE', name: 'Kenya' },
+      { code: 'KI', name: 'Kiribati' },
+      { code: 'KW', name: 'Kuwait' },
+      { code: 'KG', name: 'Kyrgyzstan' },
+      { code: 'LA', name: 'Laos' },
+      { code: 'LV', name: 'Latvia' },
+      { code: 'LB', name: 'Lebanon' },
+      { code: 'LS', name: 'Lesotho' },
+      { code: 'LR', name: 'Liberia' },
+      { code: 'LY', name: 'Libya' },
+      { code: 'LI', name: 'Liechtenstein' },
+      { code: 'LT', name: 'Lithuania' },
+      { code: 'LU', name: 'Luxembourg' },
+      { code: 'MG', name: 'Madagascar' },
+      { code: 'MW', name: 'Malawi' },
+      { code: 'MY', name: 'Malaysia' },
+      { code: 'MV', name: 'Maldives' },
+      { code: 'ML', name: 'Mali' },
+      { code: 'MT', name: 'Malta' },
+      { code: 'MH', name: 'Marshall Islands' },
+      { code: 'MR', name: 'Mauritania' },
+      { code: 'MU', name: 'Mauritius' },
+      { code: 'MX', name: 'Mexico' },
+      { code: 'FM', name: 'Micronesia' },
+      { code: 'MD', name: 'Moldova' },
+      { code: 'MC', name: 'Monaco' },
+      { code: 'MN', name: 'Mongolia' },
+      { code: 'ME', name: 'Montenegro' },
+      { code: 'MA', name: 'Morocco' },
+      { code: 'MZ', name: 'Mozambique' },
+      { code: 'MM', name: 'Myanmar' },
+      { code: 'NA', name: 'Namibia' },
+      { code: 'NR', name: 'Nauru' },
+      { code: 'NP', name: 'Nepal' },
+      { code: 'NL', name: 'Netherlands' },
+      { code: 'NZ', name: 'New Zealand' },
+      { code: 'NI', name: 'Nicaragua' },
+      { code: 'NE', name: 'Niger' },
+      { code: 'NG', name: 'Nigeria' },
+      { code: 'KP', name: 'North Korea' },
+      { code: 'MK', name: 'North Macedonia' },
+      { code: 'NO', name: 'Norway' },
+      { code: 'OM', name: 'Oman' },
+      { code: 'PK', name: 'Pakistan' },
+      { code: 'PW', name: 'Palau' },
+      { code: 'PS', name: 'Palestine' },
+      { code: 'PA', name: 'Panama' },
+      { code: 'PG', name: 'Papua New Guinea' },
+      { code: 'PY', name: 'Paraguay' },
+      { code: 'PE', name: 'Peru' },
+      { code: 'PH', name: 'Philippines' },
+      { code: 'PL', name: 'Poland' },
+      { code: 'PT', name: 'Portugal' },
+      { code: 'QA', name: 'Qatar' },
+      { code: 'RO', name: 'Romania' },
+      { code: 'RU', name: 'Russia' },
+      { code: 'RW', name: 'Rwanda' },
+      { code: 'KN', name: 'Saint Kitts and Nevis' },
+      { code: 'LC', name: 'Saint Lucia' },
+      { code: 'VC', name: 'Saint Vincent and the Grenadines' },
+      { code: 'WS', name: 'Samoa' },
+      { code: 'SM', name: 'San Marino' },
+      { code: 'ST', name: 'Sao Tome and Principe' },
+      { code: 'SA', name: 'Saudi Arabia' },
+      { code: 'SN', name: 'Senegal' },
+      { code: 'RS', name: 'Serbia' },
+      { code: 'SC', name: 'Seychelles' },
+      { code: 'SL', name: 'Sierra Leone' },
+      { code: 'SG', name: 'Singapore' },
+      { code: 'SK', name: 'Slovakia' },
+      { code: 'SI', name: 'Slovenia' },
+      { code: 'SB', name: 'Solomon Islands' },
+      { code: 'SO', name: 'Somalia' },
+      { code: 'ZA', name: 'South Africa' },
+      { code: 'KR', name: 'South Korea' },
+      { code: 'SS', name: 'South Sudan' },
+      { code: 'ES', name: 'Spain' },
+      { code: 'LK', name: 'Sri Lanka' },
+      { code: 'SD', name: 'Sudan' },
+      { code: 'SR', name: 'Suriname' },
+      { code: 'SE', name: 'Sweden' },
+      { code: 'CH', name: 'Switzerland' },
+      { code: 'SY', name: 'Syria' },
+      { code: 'TW', name: 'Taiwan' },
+      { code: 'TJ', name: 'Tajikistan' },
+      { code: 'TZ', name: 'Tanzania' },
+      { code: 'TH', name: 'Thailand' },
+      { code: 'TL', name: 'Timor-Leste' },
+      { code: 'TG', name: 'Togo' },
+      { code: 'TO', name: 'Tonga' },
+      { code: 'TT', name: 'Trinidad and Tobago' },
+      { code: 'TN', name: 'Tunisia' },
+      { code: 'TR', name: 'Turkey' },
+      { code: 'TM', name: 'Turkmenistan' },
+      { code: 'TV', name: 'Tuvalu' },
+      { code: 'UG', name: 'Uganda' },
+      { code: 'UA', name: 'Ukraine' },
+      { code: 'AE', name: 'United Arab Emirates' },
+      { code: 'GB', name: 'United Kingdom' },
+      { code: 'US', name: 'United States' },
+      { code: 'UY', name: 'Uruguay' },
+      { code: 'UZ', name: 'Uzbekistan' },
+      { code: 'VU', name: 'Vanuatu' },
+      { code: 'VA', name: 'Vatican City' },
+      { code: 'VE', name: 'Venezuela' },
+      { code: 'VN', name: 'Vietnam' },
+      { code: 'YE', name: 'Yemen' },
+      { code: 'ZM', name: 'Zambia' },
+      { code: 'ZW', name: 'Zimbabwe' }
+    ];
+
+    window.renderCountryOptions = function(query) {
+      const container = document.getElementById('country-items-list');
+      if (!container) return;
+      const q = (query || '').toLowerCase().trim();
+      const currentVal = document.getElementById('kyc-country').value;
+      const filtered = COUNTRY_LIST.filter(c => c.name.toLowerCase().includes(q));
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="padding:12px;font-size:13px;color:#9CA3AF;text-align:center;">No countries found</div>';
+        return;
+      }
+
+      container.innerHTML = filtered.map(c => {
+        const isSel = c.name === currentVal;
+        return `
+          <div class="country-option-item ${isSel ? 'selected' : ''}" onclick="selectCountry('${c.name.replace(/'/g, "\\'")}')">
+            <span>${c.name}</span>
+          </div>
+        `;
+      }).join('');
+    };
+
+    window.toggleCountryDropdown = function() {
+      const menu = document.getElementById('country-menu');
+      const arrow = document.getElementById('country-arrow');
+      if (!menu) return;
+      const isOpen = menu.style.display === 'block';
+      if (isOpen) {
+        closeCountryDropdown();
+      } else {
+        menu.style.display = 'block';
+        if (arrow) arrow.style.transform = 'rotate(180deg)';
+        const input = document.getElementById('country-search-input');
+        if (input) {
+          input.value = '';
+          input.focus();
+        }
+        renderCountryOptions('');
+      }
+    };
+
+    window.closeCountryDropdown = function() {
+      const menu = document.getElementById('country-menu');
+      const arrow = document.getElementById('country-arrow');
+      if (menu) menu.style.display = 'none';
+      if (arrow) arrow.style.transform = 'rotate(0deg)';
+    };
+
+    window.filterCountries = function(query) {
+      renderCountryOptions(query);
+    };
+
+    window.selectCountry = function(name) {
+      document.getElementById('kyc-country').value = name;
+      const label = document.getElementById('country-selected-label');
+      if (label) {
+        label.textContent = name;
+        label.style.color = '#fff';
+      }
+      closeCountryDropdown();
+      const err = document.getElementById('kyc-s1-err');
+      if (err) err.style.display = 'none';
+    };
+
+    renderCountryOptions('');
+  })();
+  </script>
+
+  <script type="module" src="./js/main.js"></script>
+  <script type="module" src="./js/autotranslate.js"></script>
+<script>
+(function(){
+  var btn=document.querySelector('.hl-menu-btn');
+  var nav=document.getElementById('hlMobileNav');
+  if(!btn||!nav)return;
+  btn.addEventListener('click',function(){
+    var open=nav.classList.toggle('open');
+    btn.classList.toggle('open');
+    document.body.style.overflow=open?'hidden':'';
+  });
+  nav.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click',function(){
+      nav.classList.remove('open');
+      btn.classList.remove('open');
+      document.body.style.overflow='';
+    });
+  });
+})();
+</script>
+</body>
+
+</html>

