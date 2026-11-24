@@ -9,10 +9,8 @@ export default defineConfig({
       'three': resolve(__dirname, 'js/vendor/three.module.js'),
     },
   },
-  css: {
-    minify: 'esbuild',
-  },
   build: {
+    cssMinify: 'esbuild',
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
