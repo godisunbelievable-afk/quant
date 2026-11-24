@@ -10,7 +10,7 @@ export default defineConfig({
     },
   },
   build: {
-    cssMinify: 'esbuild',
+    cssMinify: false,
     rollupOptions: {
       input: {
         main: resolve(__dirname, 'index.html'),
