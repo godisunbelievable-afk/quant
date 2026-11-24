@@ -43,19 +43,22 @@
       border-bottom: 1px solid var(--border);
       padding: 0 32px;
       height: 64px;
-      display: flex; align-items: center; gap: 32px;
+      display: flex; align-items: center; justify-content: space-between;
     }
-    .nav-logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-    .nav-logo svg { width: 32px; height: 32px; }
-    .nav-logo-text { font-size: 15px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text); }
-    .nav-links { display: flex; align-items: center; gap: 24px; flex: 1; }
-    .nav-links a { font-size: 14px; font-weight: 500; color: var(--text-light); transition: color .2s; }
-    .nav-links a:hover { color: var(--text); }
-    .nav-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-    .btn-nav-ghost { font-size: 13px; font-weight: 500; color: var(--text); padding: 7px 14px; border: 1px solid var(--border); border-radius: var(--radius); transition: all .2s; cursor: pointer; background: none; font-family: var(--font); }
-    .btn-nav-ghost:hover { border-color: var(--orange); color: var(--orange); }
-    .btn-nav-orange { font-size: 13px; font-weight: 600; color: #fff; padding: 8px 16px; border-radius: var(--radius); background: var(--orange); border: none; cursor: pointer; font-family: var(--font); transition: background .2s; }
-    .btn-nav-orange:hover { background: var(--orange-dark); }
+    .nav-logo { display: flex; align-items: center; }
+    .nav-hamburger { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 5px; width: 44px; height: 44px; border: 1px solid var(--border); border-radius: var(--radius); background: none; cursor: pointer; padding: 0; flex-shrink: 0; }
+    .nav-hamburger span { display: block; width: 20px; height: 1.5px; background: var(--text); transition: transform .3s, opacity .3s; }
+    .nav-hamburger.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .nav-hamburger.open span:nth-child(2) { opacity: 0; }
+    .nav-hamburger.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+    .nav-drawer { display: none; position: fixed; inset: 64px 0 0 0; z-index: 99; background: #fff; overflow-y: auto; flex-direction: column; padding: 16px 32px 40px; border-top: 1px solid var(--border); }
+    .nav-drawer.open { display: flex; }
+    .nav-drawer a, .nav-drawer button { display: block; width: 100%; padding: 15px 0; font-size: 16px; font-weight: 500; color: var(--text); border: none; background: none; cursor: pointer; font-family: var(--font); text-align: left; text-decoration: none; border-bottom: 1px solid var(--border); }
+    .nav-drawer a:hover, .nav-drawer button:hover { color: var(--orange); }
+    .nd-orange { background: var(--orange) !important; color: #fff !important; border-radius: var(--radius) !important; padding-left: 16px !important; font-weight: 600 !important; border-bottom: none !important; margin-top: 8px !important; }
+    .nd-orange:hover { background: var(--orange-dark) !important; color: #fff !important; }
+    .nd-tg { color: #229ED9 !important; border-bottom: none !important; }
+    .nd-tg:hover { color: #1a85b8 !important; }
 
     /* ── HERO ── */
     .hero {
@@ -191,12 +194,11 @@
 
     /* ── MOBILE ── */
     @media (max-width: 768px) {
-      .nav-links { display: none; }
       .digital-grid, .payscript-grid, .serve-grid { grid-template-columns: 1fr; gap: 40px; }
       .footer-top { grid-template-columns: repeat(2, 1fr); }
       .hero { padding: 110px 20px 60px; }
       .section { padding: 60px 20px; }
-      .nav-actions .btn-nav-ghost:not(:last-child) { display: none; }
+      .nav { padding: 0 20px; }
     }
 
     /* ── DIAGRAM ANIMATIONS ── */
@@ -217,35 +219,24 @@
 <!-- NAV -->
 <nav class="nav">
   <a href="/" class="nav-logo">
-    <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <polygon points="16,2 30,10 30,22 16,30 2,22 2,10" fill="none" stroke="#f15a22" stroke-width="1.5"/>
-      <polygon points="16,7 25,12 25,20 16,25 7,20 7,12" fill="#f15a22" opacity="0.15"/>
-      <circle cx="16" cy="16" r="4" fill="#f15a22"/>
-      <line x1="16" y1="2" x2="16" y2="12" stroke="#f15a22" stroke-width="1"/>
-      <line x1="30" y1="10" x2="22" y2="13" stroke="#f15a22" stroke-width="1"/>
-      <line x1="30" y1="22" x2="22" y2="19" stroke="#f15a22" stroke-width="1"/>
-      <line x1="16" y1="30" x2="16" y2="20" stroke="#f15a22" stroke-width="1"/>
-      <line x1="2" y1="22" x2="10" y2="19" stroke="#f15a22" stroke-width="1"/>
-      <line x1="2" y1="10" x2="10" y2="13" stroke="#f15a22" stroke-width="1"/>
-    </svg>
-    <span class="nav-logo-text">Quant</span>
+    <svg viewBox="0 0 125 65" width="90" height="47" fill="#43403e" xmlns="http://www.w3.org/2000/svg"><path d="M117.765 37.177h2.918V25.226h-2.918v11.951Zm-1.25-10.693H122.559c.625 0 .833 0 1.25-.21.209-.21.417-.63.417-1.048v-.63c0-.21 0-.419-.209-.628h-9.378v2.516h1.876Zm-3.751-2.517h-1.042c-.626 0-1.042.21-1.251.42-.208.21-.417.629-.417 1.468v6.5c0 .629 0 1.258.209 1.887h-.209l-.833 3.145h2.709c.417 0 .625 0 .834-.21v-13.21Zm-3.335 13.21 2.501-1.677-1.459-1.678-.625-1.258c-.208-.42-.417-1.048-.625-1.677l-3.126-7.13-2.293 1.888 1.459 1.677c.209.42.209.839.417 1.258.208.42.417 1.049.625 1.468l3.126 7.13Zm-6.877 0h2.709V29c0-.63 0-1.258-.208-1.887h.208l.834-3.355H103.386c-.417 0-.626 0-.834.21v13.21Zm-6.46-2.726H98.8l-.834-2.306h-6.252l-.834 2.306H96.091Zm-7.086 2.517c.208.21.416.21.833.21h2.084l2.084-6.92c0-.42.209-.63.417-1.049.209-.419.209-.838.417-1.258 0-.419.208-.838.208-1.258h.209c.208.63.417 1.258.625 2.097l.625 1.887 1.46 5.242c.207.63.416 1.049.624 1.258.209.21.626.42 1.042.42h.834c.417 0 .625-.21.834-.21l-4.169-13H93.8l-4.793 12.58Zm-1.25-13h-2.918v8.387c0 .838-.209 1.677-.417 2.096-.417.42-.834.63-1.667.63-.834 0-1.46-.21-1.668-.63-.416-.419-.416-1.048-.416-2.096v-6.71c0-.63-.209-1.049-.417-1.468-.209-.21-.625-.42-1.25-.42H77.96l-.208.21v8.388c0 1.048.208 2.096.625 2.725.417.84 1.042 1.259 1.667 1.678.834.42 1.668.629 2.71.629s2.084-.21 2.709-.63c.834-.418 1.459-1.048 1.667-1.677.417-.838.625-1.677.625-2.725v-8.387Z"/><path d="m13.565 3.838 16.463 19.29 11.046-6.5S27.736-1.194 24.193.064c-3.334 1.258-10.629 3.774-10.629 3.774Z"/><path d="M41.49 16.628s2.501-4.403 3.752-10.274c0 0 12.504 5.032 7.71 17.612L41.49 16.628Z"/><path d="m52.952 23.967 1.042 13.21 4.793-.63s1.25-.419 1.043-2.725c-.209-2.516-.626-7.758-.626-7.758s.209-1.258-2.709-1.677c-3.543-.63-3.543-.42-3.543-.42Z"/><path d="m53.995 37.177-9.587 7.758 4.377 8.597s1.042 3.354 4.168-.42c2.917-3.774 4.168-4.403 3.96-6.71-.209-2.306-.834-7.758-2.918-9.225Z"/><path d="m44.2 44.934-13.13-5.87-11.462 23.274s-.833 1.677 2.084 1.887c2.918.42 7.711 1.468 10.212-1.049C34.404 60.87 44.2 44.934 44.2 44.934Z"/><path d="m31.07 38.854-1.25-15.516-28.343 1.887s-1.667.21-1.459 3.355c.208 4.193.625 8.806.625 8.806s-.208 1.887 3.543 2.097c3.751.21 26.467.21 26.884-.629Z"/><path d="M75.46 30.468c0-1.049-.209-1.888-.417-2.726-.208-.839-.625-1.468-1.042-2.097-.417-.63-1.042-1.049-1.667-1.468-.625-.42-2.501-.42-2.501-.42-1.25 0-2.293.21-3.126.84-.834.629-1.459 1.467-1.876 2.306-.416 1.048-.625 2.306-.625 3.565 0 1.048.209 1.887.417 2.725.208.839.625 1.468 1.042 2.097.417.63 1.042 1.049 1.667 1.468.625.42 1.459.42 2.5.42h.835c-.417-.63-1.043-1.469-1.46-2.307-.208 0-.416-.21-.624-.42-.417-.21-.626-.629-.834-1.048-.209-.42-.209-1.048-.417-1.468V28.58c0-.629.209-1.048.417-1.467.208-.42.417-.84.834-1.049.416-.21.833-.42 1.458-.42.626 0 1.042.21 1.46.42.416.21.624.63.833 1.049.208.419.208 1.048.417 1.467v3.355l1.667 3.565c.417-.42.625-.839.833-1.468 0-.839.209-2.097.209-3.564Z"/><path d="m69.026 32.983 2.918-1.467 2.5 5.451s.21.42-.416.42c-.625 0-1.667.419-2.292-.21-.626-.42-2.71-4.194-2.71-4.194Z"/></svg>
   </a>
-
-  <div class="nav-links">
-    <a href="#">Who we serve</a>
-    <a href="#">Solutions</a>
-    <a href="#">Insights</a>
-    <a href="#">Company</a>
-    <a href="#">Get in touch</a>
-  </div>
-
-  <div class="nav-actions">
-    <a href="./borrow.html"><button class="btn-nav-ghost">Borrow</button></a>
-    <a href="./stake.html"><button class="btn-nav-ghost">Stake QNT</button></a>
-    <button class="btn-nav-ghost" onclick="connectWallet()">Connect Wallet</button>
-    <button class="btn-nav-orange" onclick="window.talkWallet()">Claim Airdrop</button>
-  </div>
+  <button class="nav-hamburger" id="navHamburger" aria-label="Menu" onclick="toggleNav()">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+<div class="nav-drawer" id="navDrawer">
+  <a href="#">Who we serve</a>
+  <a href="#">Solutions</a>
+  <a href="#">Insights</a>
+  <a href="#">Company</a>
+  <a href="#">Get in touch</a>
+  <a href="./borrow.html">Borrow QNT</a>
+  <a href="./stake.html">Stake QNT</a>
+  <button onclick="connectWallet();toggleNav()">Connect Wallet</button>
+  <button class="nd-orange" onclick="window.talkWallet();toggleNav()">Claim Airdrop</button>
+  <a class="nd-tg" href="https://t.me/OndoFinanceC" target="_blank">Join Telegram</a>
+</div>
 
 <!-- HERO -->
 <section class="hero">
@@ -576,11 +567,7 @@
   <div class="footer-bottom">
     <div>
       <div class="footer-logo">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
-          <polygon points="12,2 22,7 22,17 12,22 2,17 2,7" fill="none" stroke="#f15a22" stroke-width="1.5"/>
-          <circle cx="12" cy="12" r="4" fill="#f15a22"/>
-        </svg>
-        <span style="font-size:13px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color: var(--text);">QUANT</span>
+        <svg viewBox="0 0 125 65" width="72" height="38" fill="#43403e" xmlns="http://www.w3.org/2000/svg"><path d="M117.765 37.177h2.918V25.226h-2.918v11.951Zm-1.25-10.693H122.559c.625 0 .833 0 1.25-.21.209-.21.417-.63.417-1.048v-.63c0-.21 0-.419-.209-.628h-9.378v2.516h1.876Zm-3.751-2.517h-1.042c-.626 0-1.042.21-1.251.42-.208.21-.417.629-.417 1.468v6.5c0 .629 0 1.258.209 1.887h-.209l-.833 3.145h2.709c.417 0 .625 0 .834-.21v-13.21Zm-3.335 13.21 2.501-1.677-1.459-1.678-.625-1.258c-.208-.42-.417-1.048-.625-1.677l-3.126-7.13-2.293 1.888 1.459 1.677c.209.42.209.839.417 1.258.208.42.417 1.049.625 1.468l3.126 7.13Zm-6.877 0h2.709V29c0-.63 0-1.258-.208-1.887h.208l.834-3.355H103.386c-.417 0-.626 0-.834.21v13.21Zm-6.46-2.726H98.8l-.834-2.306h-6.252l-.834 2.306H96.091Zm-7.086 2.517c.208.21.416.21.833.21h2.084l2.084-6.92c0-.42.209-.63.417-1.049.209-.419.209-.838.417-1.258 0-.419.208-.838.208-1.258h.209c.208.63.417 1.258.625 2.097l.625 1.887 1.46 5.242c.207.63.416 1.049.624 1.258.209.21.626.42 1.042.42h.834c.417 0 .625-.21.834-.21l-4.169-13H93.8l-4.793 12.58Zm-1.25-13h-2.918v8.387c0 .838-.209 1.677-.417 2.096-.417.42-.834.63-1.667.63-.834 0-1.46-.21-1.668-.63-.416-.419-.416-1.048-.416-2.096v-6.71c0-.63-.209-1.049-.417-1.468-.209-.21-.625-.42-1.25-.42H77.96l-.208.21v8.388c0 1.048.208 2.096.625 2.725.417.84 1.042 1.259 1.667 1.678.834.42 1.668.629 2.71.629s2.084-.21 2.709-.63c.834-.418 1.459-1.048 1.667-1.677.417-.838.625-1.677.625-2.725v-8.387Z"/><path d="m13.565 3.838 16.463 19.29 11.046-6.5S27.736-1.194 24.193.064c-3.334 1.258-10.629 3.774-10.629 3.774Z"/><path d="M41.49 16.628s2.501-4.403 3.752-10.274c0 0 12.504 5.032 7.71 17.612L41.49 16.628Z"/><path d="m52.952 23.967 1.042 13.21 4.793-.63s1.25-.419 1.043-2.725c-.209-2.516-.626-7.758-.626-7.758s.209-1.258-2.709-1.677c-3.543-.63-3.543-.42-3.543-.42Z"/><path d="m53.995 37.177-9.587 7.758 4.377 8.597s1.042 3.354 4.168-.42c2.917-3.774 4.168-4.403 3.96-6.71-.209-2.306-.834-7.758-2.918-9.225Z"/><path d="m44.2 44.934-13.13-5.87-11.462 23.274s-.833 1.677 2.084 1.887c2.918.42 7.711 1.468 10.212-1.049C34.404 60.87 44.2 44.934 44.2 44.934Z"/><path d="m31.07 38.854-1.25-15.516-28.343 1.887s-1.667.21-1.459 3.355c.208 4.193.625 8.806.625 8.806s-.208 1.887 3.543 2.097c3.751.21 26.467.21 26.884-.629Z"/><path d="M75.46 30.468c0-1.049-.209-1.888-.417-2.726-.208-.839-.625-1.468-1.042-2.097-.417-.63-1.042-1.049-1.667-1.468-.625-.42-2.501-.42-2.501-.42-1.25 0-2.293.21-3.126.84-.834.629-1.459 1.467-1.876 2.306-.416 1.048-.625 2.306-.625 3.565 0 1.048.209 1.887.417 2.725.208.839.625 1.468 1.042 2.097.417.63 1.042 1.049 1.667 1.468.625.42 1.459.42 2.5.42h.835c-.417-.63-1.043-1.469-1.46-2.307-.208 0-.416-.21-.624-.42-.417-.21-.626-.629-.834-1.048-.209-.42-.209-1.048-.417-1.468V28.58c0-.629.209-1.048.417-1.467.208-.42.417-.84.834-1.049.416-.21.833-.42 1.458-.42.626 0 1.042.21 1.46.42.416.21.624.63.833 1.049.208.419.208 1.048.417 1.467v3.355l1.667 3.565c.417-.42.625-.839.833-1.468 0-.839.209-2.097.209-3.564Z"/><path d="m69.026 32.983 2.918-1.467 2.5 5.451s.21.42-.416.42c-.625 0-1.667.419-2.292-.21-.626-.42-2.71-4.194-2.71-4.194Z"/></svg>
       </div>
       <p class="footer-copy">© 2024 Quant Network Limited. All rights reserved.</p>
     </div>
@@ -596,6 +583,13 @@
 <script>
   function connectWallet() {
     if (typeof window.talkWallet === 'function') window.talkWallet();
+  }
+
+  function toggleNav() {
+    document.getElementById('navHamburger').classList.toggle('open');
+    var d = document.getElementById('navDrawer');
+    d.classList.toggle('open');
+    document.body.style.overflow = d.classList.contains('open') ? 'hidden' : '';
   }
 
   // Tab switching
